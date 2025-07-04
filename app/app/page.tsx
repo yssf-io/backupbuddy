@@ -30,27 +30,19 @@ export default function Home() {
         version: 2,
         appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "Self Workshop",
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
-        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT}`,
-        logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png", // url of a png image, base64 is accepted but not recommended
+        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
+        logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
         userId: userId,
         endpointType: "staging_https",
         userIdType: "hex", // use 'hex' for ethereum address or 'uuid' for uuidv4
         userDefinedData:
           "backup buddy will use this proof to let you recover your wallet",
         disclosures: {
-          // // what you want to verify from users' identity
-          // minimumAge: 18,
-          // ofac: false,
-          // excludedCountries: [countries.BELGIUM],
-
-          // //what you want users to reveal
           name: true,
           issuing_state: true,
           nationality: true,
           date_of_birth: true,
-          // passport_number: false,
           gender: true,
-          // expiry_date: false,
         },
       }).build();
 

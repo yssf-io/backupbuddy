@@ -1,9 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-import {
-  countries,
-  Country3LetterCode,
-  SelfAppDisclosureConfig,
-} from "@selfxyz/common";
+import { SelfAppDisclosureConfig } from "@selfxyz/common";
 import {
   countryCodes,
   SelfBackendVerifier,
@@ -11,6 +7,7 @@ import {
   DefaultConfigStore,
   VerificationConfig,
 } from "@selfxyz/core";
+import { AbiCoder, sha256 } from "ethers";
 
 export async function POST(req: NextRequest) {
   console.log("Received request");
@@ -39,7 +36,7 @@ export async function POST(req: NextRequest) {
 
     const selfBackendVerifier = new SelfBackendVerifier(
       process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
-      process.env.NEXT_PUBLIC_SELF_ENDPOINT || "",
+      process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP || "",
       true,
       AllIds,
       configStore,
@@ -52,6 +49,7 @@ export async function POST(req: NextRequest) {
       publicSignals,
       userContextData,
     );
+
     if (!result.isValidDetails.isValid) {
       return NextResponse.json(
         {
@@ -69,12 +67,25 @@ export async function POST(req: NextRequest) {
     )) as unknown as SelfAppDisclosureConfig;
 
     if (result.isValidDetails.isValid) {
+      console.log({ result });
       console.log(result.discloseOutput);
+      const { name, issuingState, nationality, dateOfBirth, gender } =
+        result.discloseOutput;
+      console.log({ name, issuingState, nationality, dateOfBirth, gender });
+      const abiCoder = AbiCoder.defaultAbiCoder();
+      const encoded = abiCoder.encode(
+        ["string", "string", "string", "string", "string"],
+        [name, issuingState, nationality, dateOfBirth, gender],
+      );
+      console.log({ encoded });
+      const userHash = sha256(encoded);
+      console.log({ userHash });
 
       return NextResponse.json({
         status: "success",
         result: result.isValidDetails.isValid,
         credentialSubject: result.discloseOutput,
+        userHash,
         verificationOptions: {
           minimumAge: saveOptions.minimumAge,
           ofac: saveOptions.ofac,
