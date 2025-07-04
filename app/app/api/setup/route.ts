@@ -8,7 +8,7 @@ import {
   VerificationConfig,
 } from "@selfxyz/core";
 import { AbiCoder, sha256 } from "ethers";
-import { Redis } from "@upstash/redis";
+import { Redis } from "ioredis";
 import { randomBytes } from "crypto";
 
 export async function POST(req: NextRequest) {
@@ -82,17 +82,13 @@ export async function POST(req: NextRequest) {
       console.log({ encoded });
       const userHash = sha256(encoded);
       console.log({ userHash });
-      const redis = new Redis({
-        url: process.env.REDIS_ENDPOINT,
-        token: process.env.REDIS_TOKEN,
-      });
+      const redis = new Redis(process.env.REDIS_ENDPOINT!);
 
       const passphrase = randomBytes(32).toString("hex");
       console.log({ passphrase });
 
-      const users: { [userHash: string]: string } | null =
-        await redis.get("backup-users");
-      if (!users) {
+      const usersRaw = await redis.get("backup-users");
+      if (!usersRaw) {
         return NextResponse.json(
           {
             status: "error",
@@ -104,6 +100,7 @@ export async function POST(req: NextRequest) {
         );
       }
 
+      const users = JSON.parse(usersRaw);
       console.log({ users });
       users[userHash] = passphrase;
       await redis.set("backup-users", JSON.stringify(users, null, 2));
