@@ -8,6 +8,8 @@ import {
   VerificationConfig,
 } from "@selfxyz/core";
 import { AbiCoder, sha256 } from "ethers";
+import { Redis } from "@upstash/redis";
+import { randomBytes } from "crypto";
 
 export async function POST(req: NextRequest) {
   console.log("Received request");
@@ -80,6 +82,31 @@ export async function POST(req: NextRequest) {
       console.log({ encoded });
       const userHash = sha256(encoded);
       console.log({ userHash });
+      const redis = new Redis({
+        url: process.env.REDIS_ENDPOINT,
+        token: process.env.REDIS_TOKEN,
+      });
+
+      const passphrase = randomBytes(32).toString("hex");
+      console.log({ passphrase });
+
+      const users: { [userHash: string]: string } | null =
+        await redis.get("backup-users");
+      if (!users) {
+        return NextResponse.json(
+          {
+            status: "error",
+            result: false,
+            message: "Couldn't get backup-users key",
+            details: result.isValidDetails,
+          },
+          { status: 500 },
+        );
+      }
+
+      console.log({ users });
+      users[userHash] = passphrase;
+      await redis.set("backup-users", JSON.stringify(users, null, 2));
 
       return NextResponse.json({
         status: "success",
