@@ -55,9 +55,9 @@ export default function SetupPage() {
 
   const setupSteps: Step[] = [
     { id: "passport", label: "Identity Verification" },
+    { id: "seed", label: "Seedphrase Setup" },
     { id: "recovery", label: "Recovery Setup" },
-    { id: "shards", label: "Provide Shards" },
-    { id: "seed", label: "Recover Seedphrase" },
+    { id: "sharing", label: "Share Shards" },
   ];
 
   return (

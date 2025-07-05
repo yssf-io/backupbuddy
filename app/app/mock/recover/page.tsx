@@ -11,7 +11,7 @@ import {
 import { ethers } from "ethers";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
 import { useToastContext } from "../../contexts/ToastContext";
-import StepIndicator from "../../components/StepIndicator";
+import StepIndicator, { Step } from "../../components/StepIndicator";
 
 export default function RecoverPage() {
   const router = useRouter();
@@ -92,9 +92,9 @@ export default function RecoverPage() {
 
   const setupSteps: Step[] = [
     { id: "passport", label: "Identity Verification" },
-    { id: "seed", label: "Seedphrase Setup" },
     { id: "recovery", label: "Recovery Setup" },
-    { id: "sharing", label: "Share Shards" },
+    { id: "shards", label: "Provide Shards" },
+    { id: "seed", label: "Recover Seedphrase" },
   ];
 
   return (
