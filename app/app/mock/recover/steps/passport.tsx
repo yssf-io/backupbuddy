@@ -53,7 +53,7 @@ export default function PassportStep({ onBack }: PassportStepProps) {
         version: 2,
         appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "BackupBuddy",
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "backupbuddy",
-        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
+        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_RECOVER}`,
         logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
         userId,
         endpointType: "staging_https",
@@ -108,8 +108,7 @@ export default function PassportStep({ onBack }: PassportStepProps) {
     const res = await fetch(`/api/pass/${encodeURIComponent(id)}`);
     if (!res.ok) throw new Error("Key not found");
     const { pass } = await res.json();
-    console.log({ pass });
-    setPassphrase("pass");
+    setPassphrase(pass);
     updatePassportState({ isVerified: true });
     displayToast("Verification successful! Moving to next step...");
     goToNextStep();
