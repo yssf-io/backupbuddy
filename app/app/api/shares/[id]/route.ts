@@ -7,9 +7,6 @@ const getShareData = (id: string) => {
 	if (id === 'share-2-of-5') {
 		return {
 			shareString: "alice alice alice",
-			shareNumber: 2,
-			totalShares: 5,
-			senderName: "Alex",
 		};
 	}
 	return null;

@@ -89,8 +89,24 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
       const shares = await createShares(new TextEncoder().encode(`${state.seedphrase.words.join(" ")}${state.seedphrase.words.join(" ")}`), {groupThreshold: 1, groups: [{ threshold: state.recoveryParams.minShards, count: state.recoveryParams.totalShards }]}, state.passphrase)
       console.log({shares})
 
+    try {
+      const response = await fetch('/api/shares', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ shares }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong');
+      }
+
+      console.log('Successfully stored shares. IDs:', data.shareIds);
       const shards = shares.map((s) => s.split(" ")).map((s, i) => {return {
-        id: i.toString(),
+        id: data.shareIds[i],
         words: s,
         guardianName: `Guardian #${i}`,
         isShared: false,
@@ -98,6 +114,11 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
         isRevealed: false
       }})
       updateShardSharingState({ shards:  shards});
+
+    } catch (err: any) {
+      console.error('Failed to store shares:', err);
+    }
+
     }
   }
   useEffect(() => {
