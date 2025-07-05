@@ -30,10 +30,10 @@ export default function Home() {
         version: 2,
         appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "Self Workshop",
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
-        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
+        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS}`,
         logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
         userId: userId,
-        endpointType: "staging_https",
+        endpointType: "staging_celo",
         userIdType: "hex", // use 'hex' for ethereum address or 'uuid' for uuidv4
         userDefinedData:
           "backup buddy will use this proof to let you recover your wallet",

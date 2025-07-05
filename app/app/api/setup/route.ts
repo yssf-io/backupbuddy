@@ -38,7 +38,7 @@ export async function POST(req: NextRequest) {
 
     const selfBackendVerifier = new SelfBackendVerifier(
       process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
-      process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP || "",
+      process.env.NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS || "",
       true,
       AllIds,
       configStore,
