@@ -82,26 +82,46 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
   const { toast } = useToast();
   const router = useRouter();
   const { state, updateShardSharingState, setComplete } = useSetup();
-  // alice alice alice alice alice alice alice alice alice alice alice alice 
+  // alice alice alice alice alice alice alice alice alice alice alice alice
   // Initialize shards if not already done
   const getShards = async () => {
     if (state.shardSharing.shards.length === 0) {
-      const shares = await createShares(new TextEncoder().encode(`${state.seedphrase.words.join(" ")}${state.seedphrase.words.join(" ")}`), {groupThreshold: 1, groups: [{ threshold: state.recoveryParams.minShards, count: state.recoveryParams.totalShards }]}, state.passphrase)
-      console.log({shares})
+      const shares = await createShares(
+        new TextEncoder().encode(
+          `${state.seedphrase.words.join(" ")}${state.seedphrase.words.join(
+            " "
+          )}`
+        ),
+        {
+          groupThreshold: 1,
+          groups: [
+            {
+              threshold: state.recoveryParams.minShards,
+              count: state.recoveryParams.totalShards,
+            },
+          ],
+        },
+        state.passphrase
+      );
+      console.log({ shares });
 
-      const shards = shares.map((s) => s.split(" ")).map((s, i) => {return {
-        id: i.toString(),
-        words: s,
-        guardianName: `Guardian #${i}`,
-        isShared: false,
-        isActive: i === 0,
-        isRevealed: false
-      }})
-      updateShardSharingState({ shards:  shards});
+      const shards = shares
+        .map((s) => s.split(" "))
+        .map((s, i) => {
+          return {
+            id: i.toString(),
+            words: s,
+            guardianName: `Guardian #${i}`,
+            isShared: false,
+            isActive: i === 0,
+            isRevealed: false,
+          };
+        });
+      updateShardSharingState({ shards: shards });
     }
-  }
+  };
   useEffect(() => {
-    getShards()
+    getShards();
   }, [
     state.recoveryParams,
     state.shardSharing.shards.length,

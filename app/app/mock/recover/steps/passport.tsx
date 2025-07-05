@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { getUniversalLink } from "@selfxyz/core";
 import {
   SelfQRcodeWrapper,
@@ -10,7 +10,7 @@ import {
 import { ethers } from "ethers";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
 import { useToastContext } from "../../../contexts/ToastContext";
-import { useSetup } from "../../../contexts/SetupContext";
+import { useSetup } from "../../../contexts/RecoverContext";
 import { v4 } from "uuid";
 import { bytesToHex, hexToBytes } from "viem";
 
