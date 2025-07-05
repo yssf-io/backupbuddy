@@ -48,17 +48,16 @@ export default function Home() {
     });
 
     console.log(events[0]);
-    console.log(events[0].args);
-    console.log(events[0].data);
+    console.log({ output: events[0].args.output });
     console.log({ userData: events[0].args.userData });
 
     const userDefinedData = hexToString(events[0].args.userData!);
 
     console.log("userDefinedData:", userDefinedData);
   };
-  // useEffect(() => {
-  //   readVerificationData();
-  // }, []);
+  useEffect(() => {
+    readVerificationData();
+  }, []);
 
   // Use useEffect to ensure code only executes on the client side
   useEffect(() => {

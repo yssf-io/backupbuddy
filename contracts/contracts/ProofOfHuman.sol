@@ -18,11 +18,13 @@ contract ProofOfHuman is SelfVerificationRoot {
     SelfStructs.VerificationConfigV2 public verificationConfig;
     bytes32 public verificationConfigId;
     address public lastUserAddress;
+    mapping(string => uint256) public registeredUsers;
 
     // Events for testing
     event VerificationCompleted(
         ISelfVerificationRoot.GenericDiscloseOutputV2 output,
-        bytes userData
+        string userHash,
+        uint256 counter
     );
 
     /**
@@ -51,7 +53,10 @@ contract ProofOfHuman is SelfVerificationRoot {
         lastUserData = userData;
         lastUserAddress = address(uint160(output.userIdentifier));
 
-        emit VerificationCompleted(output, userData);
+        string memory userHash = string(data);
+        registeredUsers[userHash] += 1;
+
+        emit VerificationCompleted(output, userHash, registeredUsers[userHash]);
     }
 
     /**
