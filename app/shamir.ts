@@ -1,243 +1,142 @@
 /**
- * SLIP39: Shamir's Secret Sharing for Mnemonic Codes
+ * A production-ready wrapper for SLIP39 functionality using the 'slip39-ts' library.
+ * This module provides two simple functions to create and combine SLIP39 shares.
+ * It is isomorphic and can be used in both Node.js and browser environments.
  *
- * This implementation will follow the SLIP39 standard for splitting a master secret
- * into a set of mnemonic code shares, and for recovering the secret from a
- * threshold of those shares.
+ * To use this, you must first install the slip39-ts library:
+ * npm install slip39-ts
  *
+ * And create a declaration file (e.g., slip39-ts.d.ts) with:
+ * declare module 'slip39-ts';
  */
 
-// We'll use the Web Crypto API, available in modern browsers and client-side Next.js.
-const webCrypto = window.crypto.subtle;
+import { Slip39 } from "slip39-ts";
 
 /**
- * Configuration for creating SLIP39 shares.
- * For now, we'll use a simplified version.
+ * Configuration for creating SLIP39 share groups.
+ * Example: To create a 2-of-3 scheme, you would use:
+ * {
+ * groupThreshold: 1,
+ * groups: [{ threshold: 2, count: 3 }]
+ * }
  */
-interface SimpleSLIP39Config {
-  shares: number; // n
-  threshold: number; // t
+export interface SLIP39Config {
+  groupThreshold: number;
+  groups: {
+    threshold: number;
+    count: number;
+  }[];
 }
 
 /**
- * Represents a single SLIP39 share (as a raw byte array for now).
+ * Creates a set of SLIP39 mnemonic shares from a master secret.
+ *
+ * @param masterSecret The secret to be split (e.g., a BIP39 seed as a Uint8Array).
+ * Must be 16, 20, 24, 28, or 32 bytes in length.
+ * @param config The threshold and group configuration for the shares.
+ * @param passphrase An optional user-defined passphrase to encrypt the shares.
+ * @returns A promise that resolves to an array of SLIP39 mnemonic share strings.
+ * @throws Throws an error if the masterSecret has an invalid length.
  */
-type SLIP39RawShare = Uint8Array;
+export async function createShares(
+  masterSecret: Uint8Array,
+  config: SLIP39Config,
+  passphrase?: string,
+): Promise<string[]> {
+  const masterSecretArray = Array.from(masterSecret);
 
-class SLIP39 {
-  /**
-   * Creates a set of SLIP39 shares from a master secret.
-   * (Passphrase and mnemonic encoding will be added in the next steps).
-   *
-   * @param masterSecret The secret to be split (e.g., a BIP39 seed).
-   * @param config The threshold configuration for the shares.
-   * @returns A promise that resolves to an array of raw SLIP39 shares.
-   */
-  public static async createShares(
-    masterSecret: Uint8Array,
-    config: SimpleSLIP39Config,
-  ): Promise<SLIP39RawShare[]> {
-    console.log("Creating shares with the following parameters:");
-    console.log("Master Secret:", masterSecret);
-    console.log("Config:", config);
+  const slip = await Slip39.fromArray(masterSecretArray, {
+    passphrase: passphrase || "",
+    groupThreshold: config.groupThreshold,
+    groups: config.groups.map((g) => [g.threshold, g.count]),
+  });
 
-    // For now, we'll directly split the secret. Later, we'll add encryption.
-    const shares = this._split(masterSecret, config.shares, config.threshold);
-    return shares;
-  }
-
-  /**
-   * Recovers the master secret from a set of SLIP39 shares.
-   * (Passphrase and mnemonic decoding will be added in the next steps).
-   *
-   * @param shares An array of raw SLIP39 shares.
-   * @returns A promise that resolves to the recovered master secret.
-   */
-  public static async combineShares(
-    shares: SLIP39RawShare[],
-  ): Promise<Uint8Array> {
-    console.log("Combining shares:", shares);
-
-    // For now, we directly combine the shares. Later, we'll add decryption.
-    const secret = this._combine(shares);
-    return secret;
-  }
-
-  // --- Private Helper Methods for Shamir's Secret Sharing ---
-
-  /**
-   * Splits a secret into a number of shares using SSS.
-   * @param secret The secret to split.
-   * @param n The total number of shares to create.
-   * @param t The threshold of shares required to reconstruct the secret.
-   * @returns An array of shares, where each share is a Uint8Array containing [x, ...y_values].
-   */
-  private static _split(
-    secret: Uint8Array,
-    n: number,
-    t: number,
-  ): Uint8Array[] {
-    if (t > n) {
-      throw new Error("Threshold cannot be greater than the number of shares.");
+  const allShares: string[] = [];
+  for (let i = 0; i < config.groups.length; i++) {
+    for (let j = 0; j < config.groups[i].count; j++) {
+      const share = slip.fromPath(`r/${i}/${j}`).mnemonics;
+      allShares.push(share[0]);
     }
-    if (t <= 1) {
-      throw new Error("Threshold must be greater than 1.");
-    }
-
-    const shares: Uint8Array[] = Array.from(
-      { length: n },
-      () => new Uint8Array(secret.length + 1),
-    );
-
-    // For each byte of the secret, we create a different polynomial.
-    for (let j = 0; j < secret.length; j++) {
-      const secretByte = secret[j];
-      // The secret byte is the first coefficient (the y-intercept).
-      const coefficients = [secretByte];
-      // Generate t-1 random coefficients for the polynomial.
-      const randomBytes = window.crypto.getRandomValues(new Uint8Array(t - 1));
-      for (let k = 0; k < t - 1; k++) {
-        coefficients.push(randomBytes[k]);
-      }
-
-      // Generate a point on the polynomial for each share.
-      for (let i = 0; i < n; i++) {
-        const x = i + 1; // Use 1-based index for x-coordinate
-        if (j === 0) {
-          shares[i][0] = x; // Set the x-coordinate for this share
-        }
-        shares[i][j + 1] = this._evaluatePolynomial(coefficients, x);
-      }
-    }
-    return shares;
   }
 
-  /**
-   * Combines shares to recover the secret using Lagrange Interpolation.
-   * @param shares The shares to combine. Must have at least `threshold` shares.
-   * @returns The recovered secret.
-   */
-  private static _combine(shares: Uint8Array[]): Uint8Array {
-    const secretLength = shares[0].length - 1;
-    const secret = new Uint8Array(secretLength);
-
-    // For each byte of the secret, we interpolate the points to find the y-intercept.
-    for (let i = 0; i < secretLength; i++) {
-      const points = shares.map((share) => ({
-        x: share[0],
-        y: share[i + 1],
-      }));
-      secret[i] = this._lagrangeInterpolate(points);
-    }
-    return secret;
-  }
-
-  // --- Galois Field (GF(2^8)) Arithmetic ---
-
-  private static _gf256Add(a: number, b: number): number {
-    return a ^ b; // Addition in GF(2^8) is simply XOR.
-  }
-
-  private static _gf256Multiply(a: number, b: number): number {
-    let p = 0;
-    const irreduciblePolynomial = 0x11b; // AES irreducible polynomial x^8 + x^4 + x^3 + x + 1
-
-    for (let counter = 0; counter < 8; counter++) {
-      if ((b & 1) !== 0) {
-        p ^= a;
-      }
-      const hi_bit_set = (a & 0x80) !== 0;
-      a <<= 1;
-      if (hi_bit_set) {
-        a ^= irreduciblePolynomial;
-      }
-      b >>= 1;
-    }
-    return p;
-  }
-
-  /**
-   * Evaluates a polynomial with the given coefficients at a point x.
-   * P(x) = c[0] + c[1]*x + c[2]*x^2 + ...
-   */
-  private static _evaluatePolynomial(coeffs: number[], x: number): number {
-    let result = 0;
-    // Evaluate using Horner's method for efficiency, from highest degree to lowest.
-    for (let i = coeffs.length - 1; i >= 0; i--) {
-      result = this._gf256Add(this._gf256Multiply(result, x), coeffs[i]);
-    }
-    return result;
-  }
-
-  /**
-   * Recovers the secret (the y-intercept, f(0)) from a set of points using Lagrange interpolation.
-   */
-  private static _lagrangeInterpolate(
-    points: { x: number; y: number }[],
-  ): number {
-    let secret = 0;
-
-    for (let i = 0; i < points.length; i++) {
-      const { x: xi, y: yi } = points[i];
-      let numerator = 1;
-      let denominator = 1;
-
-      for (let j = 0; j < points.length; j++) {
-        if (i === j) continue;
-        const { x: xj } = points[j];
-        numerator = this._gf256Multiply(numerator, xj);
-        denominator = this._gf256Multiply(denominator, this._gf256Add(xi, xj));
-      }
-
-      // Calculate modular inverse of the denominator to perform division.
-      // inv(d) = d^(254) in GF(2^8) by Fermat's Little Theorem.
-      let inverseDenominator = 1;
-      for (let k = 0; k < 254; k++) {
-        inverseDenominator = this._gf256Multiply(
-          inverseDenominator,
-          denominator,
-        );
-      }
-
-      const term = this._gf256Multiply(
-        yi,
-        this._gf256Multiply(numerator, inverseDenominator),
-      );
-      secret = this._gf256Add(secret, term);
-    }
-
-    return secret;
-  }
+  return allShares;
 }
 
-// Example Usage to test the core SSS logic.
-async function runExample() {
+/**
+ * Recovers the master secret from a set of SLIP39 mnemonic shares.
+ *
+ * @param shares An array of SLIP39 mnemonic share strings. Must meet the threshold.
+ * @param passphrase The optional passphrase used to encrypt the shares.
+ * @returns A promise that resolves to the recovered master secret as a Uint8Array.
+ * @throws Throws an error if the shares are invalid or do not meet the threshold.
+ */
+export async function combineShares(
+  shares: string[],
+  passphrase?: string,
+): Promise<Uint8Array> {
+  // The recoverSecret function returns a number[]
+  const recoveredSecretArray = await Slip39.recoverSecret(shares, passphrase);
+
+  // Convert the returned number[] to a Uint8Array.
+  return new Uint8Array(recoveredSecretArray);
+}
+
+async function runSLIP39Example() {
+  console.log("--- Running SLIP39 Library Wrapper Example ---");
   try {
-    const secret = new TextEncoder().encode("This is a very secret message!");
-    const config: SimpleSLIP39Config = {
-      shares: 5, // Create 5 shares
-      threshold: 3, // Require 3 of them to recover
+    // 1. Define a master secret (must be 16-32 bytes).
+    // In a real app, this would be a securely generated BIP39 seed.
+    const mySecret = new TextEncoder().encode(
+      "MySuperSecretKeyThatIs32BytesLng fjoiewjofij ofiwejwoiejf ew oifjwed",
+    ); // 32 bytes long
+    const myPassphrase = "a-very-strong-password-123fojiwejfew";
+
+    // 2. Define the sharing configuration: 2-of-3 shares.
+    const config: SLIP39Config = {
+      groupThreshold: 1, // We only have one group of shares
+      groups: [{ threshold: 3, count: 5 }], // We need 2 out of 3 shares from this group
     };
 
-    console.log("--- Creating Shares ---");
-    const allShares = await SLIP39.createShares(secret, config);
-    console.log("Generated 5 Raw Shares:", allShares);
-
-    console.log("\n--- Combining a Subset of Shares ---");
-    // Take a valid subset of shares (the threshold is 3)
-    const sharesToCombine = [allShares[0], allShares[2], allShares[4]];
-
-    const recoveredSecretBytes = await SLIP39.combineShares(sharesToCombine);
-    const recoveredSecretText = new TextDecoder().decode(recoveredSecretBytes);
-
-    console.log("Recovered Secret:", recoveredSecretText);
-    console.log(
-      "Success:",
-      recoveredSecretText === new TextDecoder().decode(secret),
+    // 3. Create the shares.
+    console.log("\nCreating 2-of-3 shares...");
+    const allShares = await createShares(mySecret, config, myPassphrase);
+    console.log("Generated Shares:");
+    allShares.forEach((share, index) =>
+      console.log(`  Share ${index + 1}: ${share}`),
     );
+
+    // 4. Combine a valid subset of shares to recover the secret.
+    console.log("\nAttempting to combine 2 shares...");
+    const sharesToCombine = [allShares[0], allShares[2], allShares[3]]; // Using the 1st and 3rd share
+
+    const recoveredSecret = await combineShares(sharesToCombine, myPassphrase);
+
+    // 5. Verify the result.
+    console.log("\nSecret recovered successfully!");
+    const originalSecretText = new TextDecoder().decode(mySecret);
+    const recoveredSecretText = new TextDecoder().decode(recoveredSecret);
+
+    console.log("Original secret:", originalSecretText);
+    console.log("Recovered secret:", recoveredSecretText);
+    console.log("Success:", originalSecretText === recoveredSecretText);
+
+    // 6. Example of a failing case (not enough shares)
+    try {
+      console.log("\nAttempting to combine with only 1 share (should fail)...");
+      const tmp = await combineShares(
+        [allShares[0], allShares[1], allShares[2]],
+        "ofjwiojfew",
+      );
+      console.log({ decoded: new TextDecoder().decode(tmp) });
+    } catch (e: any) {
+      console.log("Caught expected error:", e.message);
+    }
   } catch (error) {
-    console.error("An error occurred:", error);
+    console.error(
+      "\nAn unexpected error occurred during the example run:",
+      error,
+    );
   }
 }
 
-runExample();
+// runSLIP39Example();
