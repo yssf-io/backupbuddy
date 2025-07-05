@@ -48,6 +48,7 @@ export default function Home() {
     });
 
     console.log(events[0]);
+    console.log({ args: events[0].args });
     console.log({ output: events[0].args.output });
     console.log({ userData: events[0].args.userData });
 
@@ -63,25 +64,17 @@ export default function Home() {
   useEffect(() => {
     try {
       console.log({ scope: process.env.NEXT_PUBLIC_SELF_SCOPE });
-      const userId = v4();
       const app = new SelfAppBuilder({
         version: 2,
         appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "Self Workshop",
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
-        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
+        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS}`,
         logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
         userId,
-        endpointType: "staging_https",
-        userIdType: "uuid",
+        endpointType: "staging_celo",
+        userIdType: "hex",
         userDefinedData:
           "backup buddy will use this proof to let you recover your wallet",
-        disclosures: {
-          name: true,
-          issuing_state: true,
-          nationality: true,
-          date_of_birth: true,
-          gender: true,
-        },
       }).build();
       console.log({ userId });
 
