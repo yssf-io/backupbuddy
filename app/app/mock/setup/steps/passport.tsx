@@ -11,6 +11,7 @@ import { ethers } from "ethers";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
 import { useToastContext } from "../../../contexts/ToastContext";
 import { useSetup } from "../../../contexts/SetupContext";
+import { v4 } from "uuid";
 
 interface PassportStepProps {
   onBack: () => void;
@@ -32,9 +33,9 @@ export default function PassportStep({ onBack }: PassportStepProps) {
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "backupbuddy",
         endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
         logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
-        userId: userId,
+        userId: v4(),
         endpointType: "staging_https",
-        userIdType: "hex", // use 'hex' for ethereum address or 'uuid' for uuidv4
+        userIdType: "uuid",
         userDefinedData:
           "BackupBuddy will use this proof to let you recover your wallet",
         disclosures: {
