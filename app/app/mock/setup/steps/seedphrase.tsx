@@ -11,7 +11,7 @@ interface SeedphraseStepProps {
 
 export default function SeedphraseStep({ onBack }: SeedphraseStepProps) {
   const { showToast } = useToastContext();
-  const { state, updateSeedphraseState, goToNextStep, passphrase } = useSetup();
+  const { state, updateSeedphraseState, goToNextStep } = useSetup();
 
   // Check if all 12 words are filled
   useEffect(() => {
