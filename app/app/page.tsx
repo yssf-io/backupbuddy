@@ -10,6 +10,10 @@ import {
 } from "@selfxyz/qrcode";
 import { v4 } from "uuid";
 import { ethers } from "ethers";
+import { createPublicClient, hexToString, http } from "viem";
+import { celoAlfajores } from "viem/chains";
+import ProofOfHuman from "./ProofOfHuman";
+import { randomBytes } from "crypto";
 
 export default function Home() {
   const router = useRouter();
@@ -22,19 +26,54 @@ export default function Home() {
   // Use useMemo to cache the array to avoid creating a new array on each render
   const excludedCountries = useMemo(() => [countries.NORTH_KOREA], []);
 
+  const readVerificationData = async () => {
+    const client = createPublicClient({
+      chain: celoAlfajores,
+      transport: http(
+        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy",
+      ),
+    });
+
+    if (!process.env.NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS)
+      throw Error("not address found");
+
+    const events = await client.getFilterLogs({
+      filter: await client.createContractEventFilter({
+        abi: ProofOfHuman,
+        address: process.env.NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS as `0x${string}`,
+        eventName: "VerificationCompleted",
+        fromBlock: BigInt(0),
+        toBlock: await client.getBlockNumber(),
+      }),
+    });
+
+    console.log(events[0]);
+    console.log(events[0].args);
+    console.log(events[0].data);
+    console.log({ userData: events[0].args.userData });
+
+    const userDefinedData = hexToString(events[0].args.userData!);
+
+    console.log("userDefinedData:", userDefinedData);
+  };
+  // useEffect(() => {
+  //   readVerificationData();
+  // }, []);
+
   // Use useEffect to ensure code only executes on the client side
   useEffect(() => {
     try {
       console.log({ scope: process.env.NEXT_PUBLIC_SELF_SCOPE });
+      const userId = v4();
       const app = new SelfAppBuilder({
         version: 2,
         appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "Self Workshop",
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
-        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS}`,
+        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
         logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
-        userId: userId,
-        endpointType: "staging_celo",
-        userIdType: "hex", // use 'hex' for ethereum address or 'uuid' for uuidv4
+        userId,
+        endpointType: "staging_https",
+        userIdType: "uuid",
         userDefinedData:
           "backup buddy will use this proof to let you recover your wallet",
         disclosures: {
@@ -45,6 +84,7 @@ export default function Home() {
           gender: true,
         },
       }).build();
+      console.log({ userId });
 
       setSelfApp(app);
       setUniversalLink(getUniversalLink(app));
