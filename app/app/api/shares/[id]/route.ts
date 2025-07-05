@@ -2,28 +2,34 @@ import { NextRequest, NextResponse } from 'next/server';
 import { PKPass } from 'passkit-generator';
 import path from 'path';
 import fs from "fs"
-
-const getShareData = (id: string) => {
-	if (id === 'share-2-of-5') {
-		return {
-			shareString: "alice alice alice",
-		};
-	}
-	return null;
-};
+import Redis from 'ioredis';
 
 export async function GET(
 	request: NextRequest,
 	{ params }: { params: { id:string } }
 ) {
-	const shareData = getShareData(params.id);
 
-	if (!shareData) {
-		return new NextResponse('Share not found', { status: 404 });
+  const shareId = params.id;
+
+	if (!shareId) {
+		return NextResponse.json({ error: 'Share ID is required.' }, { status: 400 });
 	}
 
-  console.log({barcode: shareData.shareString})
-	// 1. Create the object that will become the content of pass.json
+  const redis = new Redis(process.env.REDIS_ENDPOINT || 'redis://localhost:6379');
+  const SHARES_KEY = 'shares';
+  const allSharesRaw = await redis.get(SHARES_KEY);
+
+		if (!allSharesRaw) {
+			return NextResponse.json({ error: 'Share not found.' }, { status: 404 });
+		}
+
+		const allShares = JSON.parse(allSharesRaw);
+		const shareValue = allShares[shareId];
+
+		if (!shareValue) {
+			return NextResponse.json({ error: 'Share not found.' }, { status: 404 });
+		}
+
 	const passModel = {
 		formatVersion: 1,
 		organizationName: "Secret Sharer Inc.",
@@ -32,7 +38,7 @@ export async function GET(
 		foregroundColor: "rgb(255, 255, 255)",
 		backgroundColor: "rgb(45, 57, 78)",
 		barcode: {
-			message: shareData.shareString,
+			message: shareValue,
 			format: "PKBarcodeFormatQR",
 			messageEncoding: "iso-8859-1",
 		},
@@ -50,20 +56,15 @@ export async function GET(
 		},
 	};
 
-	// 2. Instantiate the pass using the official constructor signature
 	const pass = new PKPass(
-		// First Argument: An object of file buffers. We create pass.json on the fly.
 		{
 			"pass.json": Buffer.from(JSON.stringify(passModel))
-			// You can add your image buffers here later, e.g. "icon.png": fs.readFileSync(...)
 		},
-		// Second Argument: The certificates object
 		{
 			wwdr: process.env.PASS_WWDR_CERTIFICATE!,
 			signerCert: process.env.PASS_CERTIFICATE!,
 			signerKey: process.env.PASS_PRIVATE_KEY!,
 		},
-		// Third Argument: An object for top-level keys to add or override in pass.json
 		{
 			passTypeIdentifier: process.env.PASS_TYPE_ID!,
 			teamIdentifier: process.env.PASS_TEAM_ID!,
@@ -73,7 +74,7 @@ export async function GET(
 
   pass.setBarcodes(
 		{
-			message: shareData.shareString,
+			message: shareValue,
 			format: "PKBarcodeFormatQR",
 			messageEncoding: "iso-8859-1",
 		}

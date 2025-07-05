@@ -90,7 +90,7 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
       console.log({shares})
 
     try {
-      const response = await fetch('/api/shares', {
+      const response = await fetch('/api/uploadshares', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
