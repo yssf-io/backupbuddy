@@ -12,6 +12,8 @@ import {
 import { useToast } from "../../../../src/hooks/use-toast";
 import { useSetup } from "../../../contexts/SetupContext";
 import { useRouter } from "next/navigation";
+import { createShares } from "../../../../shamir";
+import { v4 } from "uuid";
 // Simple icon components to avoid import issues
 const ChevronRightIcon = () => <span style={{ fontSize: "16px" }}>▶</span>;
 
@@ -80,16 +82,63 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
   const { toast } = useToast();
   const router = useRouter();
   const { state, updateShardSharingState, setComplete } = useSetup();
-
+  // alice alice alice alice alice alice alice alice alice alice alice alice
   // Initialize shards if not already done
-  useEffect(() => {
+  const getShards = async () => {
     if (state.shardSharing.shards.length === 0) {
-      const shards = generateMockShards(
-        state.recoveryParams.totalShards,
-        state.recoveryParams.includeBackupBuddyShare
+      const shares = await createShares(
+        new TextEncoder().encode(
+          `${state.seedphrase.words.join(" ")}${state.seedphrase.words.join(
+            " "
+          )}`
+        ),
+        {
+          groupThreshold: 1,
+          groups: [
+            {
+              threshold: state.recoveryParams.minShards,
+              count: state.recoveryParams.totalShards,
+            },
+          ],
+        },
+        state.passphrase
       );
-      updateShardSharingState({ shards });
+      console.log({ shares });
+
+    try {
+      const response = await fetch('/api/uploadshares', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ shares }),
+      });
+
+      const data = await response.json();
+
+      if (!response.ok) {
+        throw new Error(data.error || 'Something went wrong');
+      }
+
+      console.log('Successfully stored shares. IDs:', data.shareIds);
+      const shards = shares.map((s) => s.split(" ")).map((s, i) => {return {
+        id: data.shareIds[i],
+        words: s,
+        guardianName: `Guardian #${i}`,
+        isShared: false,
+        isActive: i === 0,
+        isRevealed: false
+      }})
+      updateShardSharingState({ shards:  shards});
+
+    } catch (err: any) {
+      console.error('Failed to store shares:', err);
     }
+
+    }
+  }
+  useEffect(() => {
+    getShards();
   }, [
     state.recoveryParams,
     state.shardSharing.shards.length,
@@ -156,7 +205,7 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
   const shareOnApp = (app: string, shard: Shard) => {
     const text = `BackupBuddy Shard for ${
       shard.guardianName
-    }:\n\n${shard.words.join(" ")}`;
+    }:\n\nhttps://4dba-78-203-116-217.ngrok-free.app/api/shares/${shard.id}`;
     const encodedText = encodeURIComponent(text);
 
     const urls = {

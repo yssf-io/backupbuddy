@@ -27,46 +27,50 @@ export default function StepIndicator({
           const isCompleted = index < currentStepIndex;
 
           return (
-            <React.Fragment key={step.id}>
-              <Box
-                style={{
-                  width: "24px",
-                  height: "24px",
-                  borderRadius: "50%",
-                  backgroundColor:
-                    isActive || isCompleted ? "var(--teal-9)" : "var(--gray-6)",
-                  color: "white",
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontSize: "12px",
-                  fontWeight: "bold",
-                }}>
-                {index + 1}
-              </Box>
-              <Text
-                size="2"
-                style={{
-                  color:
-                    isActive || isCompleted
-                      ? "var(--teal-11)"
-                      : "var(--gray-11)",
-                  fontWeight: isActive ? "600" : "400",
-                }}>
-                {step.label}
-              </Text>
-              {index < steps.length - 1 && (
+            <Flex gap="2" align="center" justify="center" wrap="wrap">
+              <React.Fragment key={step.id}>
                 <Box
                   style={{
-                    width: "20px",
-                    height: "2px",
-                    backgroundColor: isCompleted
-                      ? "var(--teal-9)"
-                      : "var(--gray-6)",
-                  }}
-                />
-              )}
-            </React.Fragment>
+                    width: "24px",
+                    height: "24px",
+                    borderRadius: "50%",
+                    backgroundColor:
+                      isActive || isCompleted
+                        ? "var(--teal-9)"
+                        : "var(--gray-6)",
+                    color: "white",
+                    display: "flex",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    fontSize: "12px",
+                    fontWeight: "bold",
+                  }}>
+                  {index + 1}
+                </Box>
+                <Text
+                  size="2"
+                  style={{
+                    color:
+                      isActive || isCompleted
+                        ? "var(--teal-11)"
+                        : "var(--gray-11)",
+                    fontWeight: isActive ? "600" : "400",
+                  }}>
+                  {step.label}
+                </Text>
+                {index < steps.length - 1 && (
+                  <Box
+                    style={{
+                      width: "20px",
+                      height: "2px",
+                      backgroundColor: isCompleted
+                        ? "var(--teal-9)"
+                        : "var(--gray-6)",
+                    }}
+                  />
+                )}
+              </React.Fragment>
+            </Flex>
           );
         })}
       </Flex>

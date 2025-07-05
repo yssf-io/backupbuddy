@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // Types for all setup states
-export type SetupStep = "passport" | "seed" | "recovery" | "sharing";
+export type SetupStep = "passport" | "seed" | "shards" | "recovery";
 
 export interface PassportState {
   isVerified: boolean;
@@ -14,11 +14,9 @@ export interface PassportState {
 
 export interface SeedphraseState {
   words: string[];
-  isValid: boolean;
 }
 
 export interface RecoveryParamsState {
-  totalShards: number;
   minShards: number;
   includeBackupBuddyShare: boolean;
 }
@@ -32,14 +30,13 @@ export interface Shard {
   isActive: boolean;
 }
 
-export interface ShardSharingState {
+export interface ProvideShardsState {
   shards: Shard[];
   selectedShard: Shard | null;
   isDialogOpen: boolean;
   revealedItems: {
     shard: boolean;
   };
-  confirmShared: boolean;
 }
 
 // Main setup state interface
@@ -48,19 +45,18 @@ export interface SetupState {
   passport: PassportState;
   seedphrase: SeedphraseState;
   recoveryParams: RecoveryParamsState;
-  shardSharing: ShardSharingState;
-  isComplete: boolean;
+  shardSharing: ProvideShardsState;
   passphrase: string;
 }
 
 // Context interface
-interface SetupContextType {
+interface RecoverContextType {
   state: SetupState;
   setCurrentStep: (step: SetupStep) => void;
   updatePassportState: (updates: Partial<PassportState>) => void;
   updateSeedphraseState: (updates: Partial<SeedphraseState>) => void;
   updateRecoveryParamsState: (updates: Partial<RecoveryParamsState>) => void;
-  updateShardSharingState: (updates: Partial<ShardSharingState>) => void;
+  updateProvideShardsState: (updates: Partial<ProvideShardsState>) => void;
   setComplete: (complete: boolean) => void;
   resetSetup: () => void;
   goToNextStep: () => void;
@@ -79,10 +75,8 @@ const initialState: SetupState = {
   },
   seedphrase: {
     words: ["", "", "", "", "", "", "", "", "", "", "", ""],
-    isValid: false,
   },
   recoveryParams: {
-    totalShards: 9,
     minShards: 3,
     includeBackupBuddyShare: true,
   },
@@ -91,14 +85,12 @@ const initialState: SetupState = {
     selectedShard: null,
     isDialogOpen: false,
     revealedItems: { shard: false },
-    confirmShared: false,
   },
-  isComplete: false,
   passphrase: "",
 };
 
 // Create context
-const SetupContext = createContext<SetupContextType | undefined>(undefined);
+const RecoverContext = createContext<RecoverContextType | undefined>(undefined);
 
 // Provider component
 export function SetupProvider({ children }: { children: ReactNode }) {
@@ -133,7 +125,7 @@ export function SetupProvider({ children }: { children: ReactNode }) {
     }));
   };
 
-  const updateShardSharingState = (updates: Partial<ShardSharingState>) => {
+  const updateProvideShardsState = (updates: Partial<ProvideShardsState>) => {
     setState((prev) => ({
       ...prev,
       shardSharing: { ...prev.shardSharing, ...updates },
@@ -148,7 +140,7 @@ export function SetupProvider({ children }: { children: ReactNode }) {
     setState(initialState);
   };
 
-  const stepOrder: SetupStep[] = ["passport", "seed", "recovery", "sharing"];
+  const stepOrder: SetupStep[] = ["passport", "recovery", "shards", "seed"];
 
   const goToNextStep = () => {
     setState((prev) => {
@@ -174,14 +166,14 @@ export function SetupProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const value: SetupContextType = {
+  const value: RecoverContextType = {
     state,
     setCurrentStep,
     setPassphrase,
     updatePassportState,
     updateSeedphraseState,
     updateRecoveryParamsState,
-    updateShardSharingState,
+    updateProvideShardsState,
     setComplete,
     resetSetup,
     goToNextStep,
@@ -189,13 +181,13 @@ export function SetupProvider({ children }: { children: ReactNode }) {
   };
 
   return (
-    <SetupContext.Provider value={value}>{children}</SetupContext.Provider>
+    <RecoverContext.Provider value={value}>{children}</RecoverContext.Provider>
   );
 }
 
 // Hook to use the setup context
 export function useSetup() {
-  const context = useContext(SetupContext);
+  const context = useContext(RecoverContext);
   if (context === undefined) {
     throw new Error("useSetup must be used within a SetupProvider");
   }

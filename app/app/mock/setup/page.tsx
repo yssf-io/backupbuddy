@@ -2,7 +2,6 @@
 
 import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Flex, Text, Container, Box, Heading } from "@radix-ui/themes";
 import PassportStep from "./steps/passport";
 import SeedphraseStep from "./steps/seedphrase";
 import RecoveryParamsStep from "./steps/recovery-params";
