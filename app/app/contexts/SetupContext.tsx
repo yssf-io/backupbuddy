@@ -50,6 +50,7 @@ export interface SetupState {
   recoveryParams: RecoveryParamsState;
   shardSharing: ShardSharingState;
   isComplete: boolean;
+  passphrase: string;
 }
 
 // Context interface
@@ -64,6 +65,7 @@ interface SetupContextType {
   resetSetup: () => void;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
+  setPassphrase: (newPass: string) => void
 }
 
 // Initial state
@@ -92,6 +94,7 @@ const initialState: SetupState = {
     confirmShared: false,
   },
   isComplete: false,
+  passphrase: "",
 };
 
 // Create context
@@ -103,6 +106,10 @@ export function SetupProvider({ children }: { children: ReactNode }) {
 
   const setCurrentStep = (step: SetupStep) => {
     setState((prev) => ({ ...prev, currentStep: step }));
+  };
+
+  const setPassphrase = (newPass: string) => {
+    setState((prev) => ({ ...prev, passphrase: newPass }));
   };
 
   const updatePassportState = (updates: Partial<PassportState>) => {
@@ -180,6 +187,7 @@ export function SetupProvider({ children }: { children: ReactNode }) {
   const value: SetupContextType = {
     state,
     setCurrentStep,
+    setPassphrase,
     updatePassportState,
     updateSeedphraseState,
     updateRecoveryParamsState,
