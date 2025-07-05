@@ -2,7 +2,6 @@
 
 import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Flex, Text, Container, Box, Heading } from "@radix-ui/themes";
 import PassportStep from "./steps/passport";
 import SeedphraseStep from "./steps/seedphrase";
 import RecoveryParamsStep from "./steps/recovery-params";
@@ -56,9 +55,9 @@ export default function SetupPage() {
 
   const setupSteps: Step[] = [
     { id: "passport", label: "Identity Verification" },
-    { id: "seed", label: "Seedphrase Setup" },
     { id: "recovery", label: "Recovery Setup" },
-    { id: "sharing", label: "Share Shards" },
+    { id: "shards", label: "Provide Shards" },
+    { id: "seed", label: "Recover Seedphrase" },
   ];
 
   return (

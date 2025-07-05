@@ -9,15 +9,7 @@ import {
   type SelfApp,
 } from "@selfxyz/qrcode";
 import { ethers } from "ethers";
-import {
-  Flex,
-  Text,
-  Button,
-  Card,
-  Heading,
-  Container,
-  Box,
-} from "@radix-ui/themes";
+import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
 import { useToastContext } from "../../contexts/ToastContext";
 import StepIndicator from "../../components/StepIndicator";
 

@@ -12,7 +12,7 @@ export default function MockLayout({
   return (
     <Theme accentColor="teal" grayColor="slate" radius="large" scaling="100%">
       <ToastProvider>
-        <Container size="2" p="6">
+        <Container size="3" p="6">
           <Flex direction="column" gap="6" align="center">
             {/* Header */}
             <Box style={{ textAlign: "center" }}>
