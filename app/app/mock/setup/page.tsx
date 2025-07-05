@@ -8,6 +8,7 @@ import SeedphraseStep from "./steps/seedphrase";
 import RecoveryParamsStep from "./steps/recovery-params";
 import ShardSharingStep from "./steps/shard-sharing";
 import { useSetup, SetupStep } from "../../contexts/SetupContext";
+import StepIndicator, { Step } from "../../components/StepIndicator";
 
 export default function SetupPage() {
   const router = useRouter();
@@ -53,150 +54,17 @@ export default function SetupPage() {
     }
   };
 
+  const setupSteps: Step[] = [
+    { id: "passport", label: "Identity Verification" },
+    { id: "seed", label: "Seedphrase Setup" },
+    { id: "recovery", label: "Recovery Setup" },
+    { id: "sharing", label: "Share Shards" },
+  ];
+
   return (
     <>
       {/* Step Indicator */}
-      <Box style={{ textAlign: "center" }}>
-        <Flex gap="2" align="center" justify="center" wrap="wrap">
-          <Box
-            style={{
-              width: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              backgroundColor:
-                state.currentStep === "passport"
-                  ? "var(--teal-9)"
-                  : "var(--gray-6)",
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "12px",
-              fontWeight: "bold",
-            }}>
-            1
-          </Box>
-          <Text
-            size="2"
-            style={{
-              color:
-                state.currentStep === "passport"
-                  ? "var(--teal-11)"
-                  : "var(--gray-11)",
-              fontWeight: state.currentStep === "passport" ? "600" : "400",
-            }}>
-            Identity Verification
-          </Text>
-          <Box
-            style={{
-              width: "20px",
-              height: "2px",
-              backgroundColor: "var(--gray-6)",
-            }}
-          />
-          <Box
-            style={{
-              width: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              backgroundColor:
-                state.currentStep === "seed"
-                  ? "var(--teal-9)"
-                  : "var(--gray-6)",
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "12px",
-              fontWeight: "bold",
-            }}>
-            2
-          </Box>
-          <Text
-            size="2"
-            style={{
-              color:
-                state.currentStep === "seed"
-                  ? "var(--teal-11)"
-                  : "var(--gray-11)",
-              fontWeight: state.currentStep === "seed" ? "600" : "400",
-            }}>
-            Seedphrase Setup
-          </Text>
-          <Box
-            style={{
-              width: "20px",
-              height: "2px",
-              backgroundColor: "var(--gray-6)",
-            }}
-          />
-          <Box
-            style={{
-              width: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              backgroundColor:
-                state.currentStep === "recovery"
-                  ? "var(--teal-9)"
-                  : "var(--gray-6)",
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "12px",
-              fontWeight: "bold",
-            }}>
-            3
-          </Box>
-          <Text
-            size="2"
-            style={{
-              color:
-                state.currentStep === "recovery"
-                  ? "var(--teal-11)"
-                  : "var(--gray-11)",
-              fontWeight: state.currentStep === "recovery" ? "600" : "400",
-            }}>
-            Recovery Setup
-          </Text>
-          <Box
-            style={{
-              width: "20px",
-              height: "2px",
-              backgroundColor: "var(--gray-6)",
-            }}
-          />
-          <Box
-            style={{
-              width: "24px",
-              height: "24px",
-              borderRadius: "50%",
-              backgroundColor:
-                state.currentStep === "sharing"
-                  ? "var(--teal-9)"
-                  : "var(--gray-6)",
-              color: "white",
-              display: "flex",
-              alignItems: "center",
-              justifyContent: "center",
-              fontSize: "12px",
-              fontWeight: "bold",
-            }}>
-            4
-          </Box>
-          <Text
-            size="2"
-            style={{
-              color:
-                state.currentStep === "sharing"
-                  ? "var(--teal-11)"
-                  : "var(--gray-11)",
-              fontWeight: state.currentStep === "sharing" ? "600" : "400",
-            }}>
-            Share Shards
-          </Text>
-        </Flex>
-      </Box>
+      <StepIndicator steps={setupSteps} currentStepId={state.currentStep} />
 
       {/* Step Content */}
       {state.currentStep === "passport" && <PassportStep onBack={handleBack} />}

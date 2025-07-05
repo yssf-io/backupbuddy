@@ -321,8 +321,8 @@ export default function SetupSuccessPage() {
           </Button>
           <Button
             size="3"
-            variant="ghost"
-            className="text-primary font-semibold px-8 py-3 rounded-full hover:bg-gray-100 transition-colors min-w-[200px]"
+            variant="outline"
+            className="border-primary text-primary font-semibold px-8 py-3 rounded-full hover:bg-primary/5 transition-colors min-w-[200px]"
             onClick={handleGoHome}>
             Go to Dashboard
           </Button>
