@@ -10,20 +10,16 @@ import {
 import { ethers } from "ethers";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
 import { useToastContext } from "../../../contexts/ToastContext";
+import { useSetup } from "../../../contexts/SetupContext";
 
 interface PassportStepProps {
-  onVerificationSuccess: () => void;
   onBack: () => void;
 }
 
-export default function PassportStep({
-  onVerificationSuccess,
-  onBack,
-}: PassportStepProps) {
+export default function PassportStep({ onBack }: PassportStepProps) {
   const { showToast } = useToastContext();
-  const [linkCopied, setLinkCopied] = useState(false);
+  const { state, updatePassportState, goToNextStep } = useSetup();
   const [selfApp, setSelfApp] = useState<SelfApp | null>(null);
-  const [universalLink, setUniversalLink] = useState("");
   const [userId] = useState(ethers.ZeroAddress);
 
   // Use useEffect to ensure code only executes on the client side
@@ -51,7 +47,8 @@ export default function PassportStep({
       }).build();
 
       setSelfApp(app);
-      setUniversalLink(getUniversalLink(app));
+      const universalLink = getUniversalLink(app);
+      updatePassportState({ universalLink, userId });
     } catch (error) {
       console.error("Failed to initialize Self app:", error);
     }
@@ -62,14 +59,14 @@ export default function PassportStep({
   };
 
   const copyToClipboard = () => {
-    if (!universalLink) return;
+    if (!state.passport.universalLink) return;
 
     navigator.clipboard
-      .writeText(universalLink)
+      .writeText(state.passport.universalLink)
       .then(() => {
-        setLinkCopied(true);
+        updatePassportState({ linkCopied: true });
         displayToast("Universal link copied to clipboard!");
-        setTimeout(() => setLinkCopied(false), 2000);
+        setTimeout(() => updatePassportState({ linkCopied: false }), 2000);
       })
       .catch((err) => {
         console.error("Failed to copy text: ", err);
@@ -78,15 +75,16 @@ export default function PassportStep({
   };
 
   const openSelfApp = () => {
-    if (!universalLink) return;
+    if (!state.passport.universalLink) return;
 
-    window.open(universalLink, "_blank");
+    window.open(state.passport.universalLink, "_blank");
     displayToast("Opening Self App...");
   };
 
   const handleSuccessfulVerification = () => {
+    updatePassportState({ isVerified: true });
     displayToast("Verification successful! Moving to next step...");
-    onVerificationSuccess();
+    goToNextStep();
   };
 
   return (
@@ -149,14 +147,14 @@ export default function PassportStep({
                 size="3"
                 color="teal"
                 onClick={copyToClipboard}
-                disabled={!universalLink}
+                disabled={!state.passport.universalLink}
                 style={{
                   width: "100%",
                   borderRadius: 16,
                   fontWeight: 600,
                   fontSize: 18,
                 }}>
-                {linkCopied ? "Copied!" : "Copy Universal Link"}
+                {state.passport.linkCopied ? "Copied!" : "Copy Universal Link"}
               </Button>
             </Box>
             <Box style={{ width: "100%", maxWidth: 380 }}>
@@ -165,7 +163,7 @@ export default function PassportStep({
                 variant="outline"
                 color="teal"
                 onClick={openSelfApp}
-                disabled={!universalLink}
+                disabled={!state.passport.universalLink}
                 style={{
                   width: "100%",
                   borderRadius: 16,
@@ -198,33 +196,28 @@ export default function PassportStep({
           </Heading>
           <Flex direction="column" gap="2">
             <Flex gap="3" align="center">
-              <Box
-                style={{
-                  width: "8px",
-                  height: "8px",
-                  borderRadius: "50%",
-                  backgroundColor: "var(--teal-9)",
-                }}
-              />
-              <Text>Wallet Address</Text>
+              <Text size="2" color="gray" style={{ minWidth: "80px" }}>
+                User ID:
+              </Text>
+              <Text size="2" style={{ fontFamily: "monospace" }}>
+                {state.passport.userId || "Loading..."}
+              </Text>
             </Flex>
-            <Box
-              style={{
-                backgroundColor: "var(--gray-2)",
-                padding: "12px",
-                borderRadius: "8px",
-                border: "1px solid var(--gray-6)",
-              }}>
+            <Flex gap="3" align="center">
+              <Text size="2" color="gray" style={{ minWidth: "80px" }}>
+                Status:
+              </Text>
               <Text
                 size="2"
                 style={{
-                  fontFamily: "monospace",
-                  wordBreak: "break-all",
-                  textAlign: "center",
+                  color: state.passport.isVerified
+                    ? "var(--green-11)"
+                    : "var(--orange-11)",
+                  fontWeight: 600,
                 }}>
-                {userId ? userId : "Not connected"}
+                {state.passport.isVerified ? "✓ Verified" : "⏳ Pending"}
               </Text>
-            </Box>
+            </Flex>
           </Flex>
         </Flex>
       </Card>

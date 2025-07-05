@@ -98,199 +98,187 @@ export default function RecoverPage() {
   };
 
   return (
-    <Container size="2" p="6">
-      <Flex direction="column" gap="6" align="center">
-        {/* Header */}
-        <Box style={{ textAlign: "center" }}>
-          <Heading size="8" mb="2">
-            BackupBuddy
-          </Heading>
-          <Text size="5" color="gray">
-            Social Recovery 4 Everyone
-          </Text>
-        </Box>
-
-        {/* Main Card */}
-        <Card size="3" style={{ maxWidth: "500px", width: "100%" }}>
-          <Flex
-            direction="column"
-            gap="5"
-            align="center"
-            style={{ width: "100%" }}>
-            <Box style={{ textAlign: "center" }}>
-              <Heading size="5" mb="2" style={{ fontWeight: 700 }}>
-                Identity Verification
-              </Heading>
-              <Text color="gray" size="4">
-                Scan QR code with Self Protocol App to verify your identity for
-                recovery
-              </Text>
-            </Box>
-
-            {/* QR Code Section */}
-            <Box style={{ textAlign: "center" }}>
-              {selfApp ? (
-                <SelfQRcodeWrapper
-                  selfApp={selfApp}
-                  onSuccess={handleSuccessfulVerification}
-                  onError={() => {
-                    displayToast("Error: Failed to verify identity");
-                  }}
-                />
-              ) : (
-                <Box
-                  style={{
-                    width: "256px",
-                    height: "256px",
-                    backgroundColor: "var(--gray-3)",
-                    display: "flex",
-                    alignItems: "center",
-                    justifyContent: "center",
-                    borderRadius: "12px",
-                    margin: "0 auto",
-                  }}>
-                  <Text color="gray">Loading QR Code...</Text>
-                </Box>
-              )}
-            </Box>
-
-            {/* Action Buttons */}
-            <Flex
-              direction="column"
-              gap="4"
-              align="center"
-              style={{ width: "100%" }}>
-              <Box style={{ width: "100%", maxWidth: 380 }}>
-                <Button
-                  size="3"
-                  color="teal"
-                  onClick={copyToClipboard}
-                  disabled={!universalLink}
-                  style={{
-                    width: "100%",
-                    borderRadius: 16,
-                    fontWeight: 600,
-                    fontSize: 18,
-                  }}>
-                  {linkCopied ? "Copied!" : "Copy Universal Link"}
-                </Button>
-              </Box>
-              <Box style={{ width: "100%", maxWidth: 380 }}>
-                <Button
-                  size="3"
-                  variant="outline"
-                  color="teal"
-                  onClick={openSelfApp}
-                  disabled={!universalLink}
-                  style={{
-                    width: "100%",
-                    borderRadius: 16,
-                    fontWeight: 600,
-                    fontSize: 18,
-                  }}>
-                  Open Self App
-                </Button>
-              </Box>
-              <Button
-                size="2"
-                variant="ghost"
-                onClick={handleBack}
-                style={{
-                  marginTop: "8px",
-                  color: "#009CA8",
-                  fontWeight: 500,
-                }}>
-                ← Back
-              </Button>
-            </Flex>
-          </Flex>
-        </Card>
-
-        {/* User Info Card */}
-        <Card size="2" style={{ maxWidth: "500px", width: "100%" }}>
-          <Flex direction="column" gap="3">
-            <Heading size="4" mb="2">
-              User Information
+    <>
+      {/* Main Card */}
+      <Card size="3" style={{ maxWidth: "500px", width: "100%" }}>
+        <Flex
+          direction="column"
+          gap="5"
+          align="center"
+          style={{ width: "100%" }}>
+          <Box style={{ textAlign: "center" }}>
+            <Heading size="5" mb="2" style={{ fontWeight: 700 }}>
+              Identity Verification
             </Heading>
-            <Flex direction="column" gap="2">
-              <Flex gap="3" align="center">
-                <Box
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    backgroundColor: "var(--teal-9)",
-                  }}
-                />
-                <Text>Wallet Address</Text>
-              </Flex>
+            <Text color="gray" size="4">
+              Scan QR code with Self Protocol App to verify your identity for
+              recovery
+            </Text>
+          </Box>
+
+          {/* QR Code Section */}
+          <Box style={{ textAlign: "center" }}>
+            {selfApp ? (
+              <SelfQRcodeWrapper
+                selfApp={selfApp}
+                onSuccess={handleSuccessfulVerification}
+                onError={() => {
+                  displayToast("Error: Failed to verify identity");
+                }}
+              />
+            ) : (
               <Box
                 style={{
-                  backgroundColor: "var(--gray-2)",
-                  padding: "12px",
-                  borderRadius: "8px",
-                  border: "1px solid var(--gray-6)",
+                  width: "256px",
+                  height: "256px",
+                  backgroundColor: "var(--gray-3)",
+                  display: "flex",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  borderRadius: "12px",
+                  margin: "0 auto",
                 }}>
-                <Text
-                  size="2"
-                  style={{
-                    fontFamily: "monospace",
-                    wordBreak: "break-all",
-                    textAlign: "center",
-                  }}>
-                  {userId ? userId : "Not connected"}
-                </Text>
+                <Text color="gray">Loading QR Code...</Text>
               </Box>
-            </Flex>
-          </Flex>
-        </Card>
+            )}
+          </Box>
 
-        {/* Features Card */}
-        <Card size="2" style={{ maxWidth: "500px", width: "100%" }}>
-          <Flex direction="column" gap="3">
-            <Heading size="4" mb="2">
-              What happens next?
-            </Heading>
-            <Flex direction="column" gap="2">
-              <Flex gap="3" align="center">
-                <Box
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    backgroundColor: "var(--teal-9)",
-                  }}
-                />
-                <Text>Verify your identity with Self Protocol</Text>
-              </Flex>
-              <Flex gap="3" align="center">
-                <Box
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    backgroundColor: "var(--teal-9)",
-                  }}
-                />
-                <Text>
-                  BackupBuddy will use this proof to recover your wallet
-                </Text>
-              </Flex>
-              <Flex gap="3" align="center">
-                <Box
-                  style={{
-                    width: "8px",
-                    height: "8px",
-                    borderRadius: "50%",
-                    backgroundColor: "var(--teal-9)",
-                  }}
-                />
-                <Text>Zero-knowledge verification ensures privacy</Text>
-              </Flex>
+          {/* Action Buttons */}
+          <Flex
+            direction="column"
+            gap="4"
+            align="center"
+            style={{ width: "100%" }}>
+            <Box style={{ width: "100%", maxWidth: 380 }}>
+              <Button
+                size="3"
+                color="teal"
+                onClick={copyToClipboard}
+                disabled={!universalLink}
+                style={{
+                  width: "100%",
+                  borderRadius: 16,
+                  fontWeight: 600,
+                  fontSize: 18,
+                }}>
+                {linkCopied ? "Copied!" : "Copy Universal Link"}
+              </Button>
+            </Box>
+            <Box style={{ width: "100%", maxWidth: 380 }}>
+              <Button
+                size="3"
+                variant="outline"
+                color="teal"
+                onClick={openSelfApp}
+                disabled={!universalLink}
+                style={{
+                  width: "100%",
+                  borderRadius: 16,
+                  fontWeight: 600,
+                  fontSize: 18,
+                }}>
+                Open Self App
+              </Button>
+            </Box>
+            <Button
+              size="2"
+              variant="ghost"
+              onClick={handleBack}
+              style={{
+                marginTop: "8px",
+                color: "#009CA8",
+                fontWeight: 500,
+              }}>
+              ← Back
+            </Button>
+          </Flex>
+        </Flex>
+      </Card>
+
+      {/* User Info Card */}
+      <Card size="2" style={{ maxWidth: "500px", width: "100%" }}>
+        <Flex direction="column" gap="3">
+          <Heading size="4" mb="2">
+            User Information
+          </Heading>
+          <Flex direction="column" gap="2">
+            <Flex gap="3" align="center">
+              <Box
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  backgroundColor: "var(--teal-9)",
+                }}
+              />
+              <Text>Wallet Address</Text>
+            </Flex>
+            <Box
+              style={{
+                backgroundColor: "var(--gray-2)",
+                padding: "12px",
+                borderRadius: "8px",
+                border: "1px solid var(--gray-6)",
+              }}>
+              <Text
+                size="2"
+                style={{
+                  fontFamily: "monospace",
+                  wordBreak: "break-all",
+                  textAlign: "center",
+                }}>
+                {userId ? userId : "Not connected"}
+              </Text>
+            </Box>
+          </Flex>
+        </Flex>
+      </Card>
+
+      {/* Features Card */}
+      <Card size="2" style={{ maxWidth: "500px", width: "100%" }}>
+        <Flex direction="column" gap="3">
+          <Heading size="4" mb="2">
+            What happens next?
+          </Heading>
+          <Flex direction="column" gap="2">
+            <Flex gap="3" align="center">
+              <Box
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  backgroundColor: "var(--teal-9)",
+                }}
+              />
+              <Text>Verify your identity with Self Protocol</Text>
+            </Flex>
+            <Flex gap="3" align="center">
+              <Box
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  backgroundColor: "var(--teal-9)",
+                }}
+              />
+              <Text>
+                BackupBuddy will use this proof to recover your wallet
+              </Text>
+            </Flex>
+            <Flex gap="3" align="center">
+              <Box
+                style={{
+                  width: "8px",
+                  height: "8px",
+                  borderRadius: "50%",
+                  backgroundColor: "var(--teal-9)",
+                }}
+              />
+              <Text>Zero-knowledge verification ensures privacy</Text>
             </Flex>
           </Flex>
-        </Card>
-      </Flex>
-    </Container>
+        </Flex>
+      </Card>
+    </>
   );
 }

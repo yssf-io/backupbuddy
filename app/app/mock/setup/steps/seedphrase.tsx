@@ -1,45 +1,30 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
 import { useToastContext } from "../../../contexts/ToastContext";
+import { useSetup } from "../../../contexts/SetupContext";
 
 interface SeedphraseStepProps {
-  onContinue: (seedphrase: string[]) => void;
   onBack: () => void;
 }
 
-export default function SeedphraseStep({
-  onContinue,
-  onBack,
-}: SeedphraseStepProps) {
+export default function SeedphraseStep({ onBack }: SeedphraseStepProps) {
   const { showToast } = useToastContext();
-  const [seedphrase, setSeedphrase] = useState<string[]>([
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-    "",
-  ]);
-  const [isValid, setIsValid] = useState(false);
+  const { state, updateSeedphraseState, goToNextStep } = useSetup();
 
   // Check if all 12 words are filled
   useEffect(() => {
-    const allFilled = seedphrase.every((word) => word.trim() !== "");
-    setIsValid(allFilled);
-  }, [seedphrase]);
+    const allFilled = state.seedphrase.words.every(
+      (word) => word.trim() !== ""
+    );
+    updateSeedphraseState({ isValid: allFilled });
+  }, [state.seedphrase.words]);
 
   const handleWordChange = (index: number, value: string) => {
-    const newSeedphrase = [...seedphrase];
+    const newSeedphrase = [...state.seedphrase.words];
     newSeedphrase[index] = value;
-    setSeedphrase(newSeedphrase);
+    updateSeedphraseState({ words: newSeedphrase });
   };
 
   const handlePaste = (index: number, value: string) => {
@@ -48,7 +33,7 @@ export default function SeedphraseStep({
 
     if (words.length === 12) {
       // If exactly 12 words, fill all boxes
-      setSeedphrase(words);
+      updateSeedphraseState({ words });
       showToast("Seedphrase automatically filled!");
     } else if (words.length > 1) {
       // If multiple words but not 12, show warning
@@ -60,13 +45,15 @@ export default function SeedphraseStep({
   };
 
   const handleContinue = () => {
-    if (isValid) {
-      onContinue(seedphrase);
+    if (state.seedphrase.isValid) {
+      goToNextStep();
     }
   };
 
   const clearAll = () => {
-    setSeedphrase(["", "", "", "", "", "", "", "", "", "", "", ""]);
+    updateSeedphraseState({
+      words: ["", "", "", "", "", "", "", "", "", "", "", ""],
+    });
     showToast("All fields cleared");
   };
 
@@ -143,7 +130,7 @@ export default function SeedphraseStep({
                       </Text>
                       <input
                         type="text"
-                        value={seedphrase[index]}
+                        value={state.seedphrase.words[index]}
                         onChange={(e) =>
                           handleWordChange(index, e.target.value)
                         }
@@ -160,6 +147,16 @@ export default function SeedphraseStep({
                           fontSize: "14px",
                           textAlign: "center",
                           backgroundColor: "white",
+                          outline: "none",
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = "#009CA8";
+                          e.target.style.boxShadow =
+                            "0 0 0 2px rgba(0, 156, 168, 0.2)";
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = "var(--gray-6)";
+                          e.target.style.boxShadow = "none";
                         }}
                         placeholder={`Word ${index + 1}`}
                       />
@@ -181,7 +178,7 @@ export default function SeedphraseStep({
                       </Text>
                       <input
                         type="text"
-                        value={seedphrase[index]}
+                        value={state.seedphrase.words[index]}
                         onChange={(e) =>
                           handleWordChange(index, e.target.value)
                         }
@@ -198,6 +195,16 @@ export default function SeedphraseStep({
                           fontSize: "14px",
                           textAlign: "center",
                           backgroundColor: "white",
+                          outline: "none",
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = "#009CA8";
+                          e.target.style.boxShadow =
+                            "0 0 0 2px rgba(0, 156, 168, 0.2)";
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = "var(--gray-6)";
+                          e.target.style.boxShadow = "none";
                         }}
                         placeholder={`Word ${index + 1}`}
                       />
@@ -219,7 +226,7 @@ export default function SeedphraseStep({
                       </Text>
                       <input
                         type="text"
-                        value={seedphrase[index]}
+                        value={state.seedphrase.words[index]}
                         onChange={(e) =>
                           handleWordChange(index, e.target.value)
                         }
@@ -236,6 +243,16 @@ export default function SeedphraseStep({
                           fontSize: "14px",
                           textAlign: "center",
                           backgroundColor: "white",
+                          outline: "none",
+                        }}
+                        onFocus={(e) => {
+                          e.target.style.borderColor = "#009CA8";
+                          e.target.style.boxShadow =
+                            "0 0 0 2px rgba(0, 156, 168, 0.2)";
+                        }}
+                        onBlur={(e) => {
+                          e.target.style.borderColor = "var(--gray-6)";
+                          e.target.style.boxShadow = "none";
                         }}
                         placeholder={`Word ${index + 1}`}
                       />
@@ -257,7 +274,7 @@ export default function SeedphraseStep({
                 size="3"
                 color="teal"
                 onClick={handleContinue}
-                disabled={!isValid}
+                disabled={!state.seedphrase.isValid}
                 style={{
                   width: "100%",
                   borderRadius: 16,
@@ -267,35 +284,27 @@ export default function SeedphraseStep({
                 Continue
               </Button>
             </Box>
-            <Flex gap="3" style={{ width: "100%", maxWidth: 380 }}>
-              <Button
-                size="2"
-                variant="outline"
-                onClick={onBack}
-                style={{
-                  color: "#009CA8",
-                  boxShadow: "inset 0 0 0 0px transparent",
-                  flex: 1,
-                  fontWeight: 500,
-                  display: "flex",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  gap: "6px",
-                }}>
-                <span aria-hidden>←</span> Back
-              </Button>
-              <Button
-                size="2"
-                variant="outline"
-                onClick={clearAll}
-                style={{
-                  flex: 1,
-                  borderRadius: 16,
-                  fontWeight: 500,
-                }}>
-                Clear All
-              </Button>
-            </Flex>
+            <Button
+              size="2"
+              variant="ghost"
+              onClick={clearAll}
+              style={{
+                color: "var(--gray-11)",
+                fontWeight: 500,
+              }}>
+              Clear All
+            </Button>
+            <Button
+              size="2"
+              variant="ghost"
+              onClick={onBack}
+              style={{
+                marginTop: "8px",
+                color: "#009CA8",
+                fontWeight: 500,
+              }}>
+              ← Back
+            </Button>
           </Flex>
         </Flex>
       </Card>

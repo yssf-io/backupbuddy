@@ -1,52 +1,52 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Flex, Text, Container, Box, Heading } from "@radix-ui/themes";
 import PassportStep from "./steps/passport";
 import SeedphraseStep from "./steps/seedphrase";
-
-type SetupStep = "passport" | "seed";
+import RecoveryParamsStep from "./steps/recovery-params";
+import ShardSharingStep from "./steps/shard-sharing";
+import { useSetup, SetupStep } from "../../contexts/SetupContext";
 
 export default function SetupPage() {
   const router = useRouter();
   const searchParams = useSearchParams();
+  const { state, setCurrentStep } = useSetup();
+
   // Read step from URL, default to 'passport'
   const urlStep = searchParams.get("step") as SetupStep | null;
-  const [currentStep, setCurrentStep] = useState<SetupStep>(
-    urlStep === "seed" ? "seed" : "passport"
-  );
 
-  // Keep UI in sync with URL (browser back/forward)
+  // Initialize step from URL on first load
   useEffect(() => {
-    if (urlStep && urlStep !== currentStep) {
+    if (urlStep && urlStep !== state.currentStep) {
       setCurrentStep(urlStep);
+    } else if (!urlStep && state.currentStep !== "passport") {
+      setCurrentStep("passport");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlStep]);
 
   // When currentStep changes, update the URL (shallow routing)
   useEffect(() => {
+    console.log("state.currentStep", state.currentStep, urlStep);
+
     const params = new URLSearchParams(window.location.search);
-    if (params.get("step") !== currentStep) {
-      params.set("step", currentStep);
+    const currentUrlStep = params.get("step");
+
+    if (currentUrlStep !== state.currentStep) {
+      params.set("step", state.currentStep);
       router.push(`?${params.toString()}`, { scroll: false });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [currentStep]);
-
-  const handlePassportSuccess = () => {
-    setCurrentStep("seed");
-  };
-
-  const handleSeedphraseContinue = () => {
-    // For now, redirect to verified page
-    // In a real implementation, this would process the seedphrase
-    router.push("/verified");
-  };
+  }, [state.currentStep]);
 
   const handleBack = () => {
-    if (currentStep === "seed") {
+    if (state.currentStep === "sharing") {
+      setCurrentStep("recovery");
+    } else if (state.currentStep === "recovery") {
+      setCurrentStep("seed");
+    } else if (state.currentStep === "seed") {
       setCurrentStep("passport");
     } else {
       router.push("/mock?step=start");
@@ -54,100 +54,162 @@ export default function SetupPage() {
   };
 
   return (
-    <Container size="2" p="6">
-      <Flex direction="column" gap="6" align="center">
-        {/* Header */}
-        <Box style={{ textAlign: "center" }}>
-          <Heading size="8" mb="2">
-            BackupBuddy
-          </Heading>
-          <Text size="5" color="gray">
-            Social Recovery 4 Everyone
+    <>
+      {/* Step Indicator */}
+      <Box style={{ textAlign: "center" }}>
+        <Flex gap="2" align="center" justify="center" wrap="wrap">
+          <Box
+            style={{
+              width: "24px",
+              height: "24px",
+              borderRadius: "50%",
+              backgroundColor:
+                state.currentStep === "passport"
+                  ? "var(--teal-9)"
+                  : "var(--gray-6)",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: "bold",
+            }}>
+            1
+          </Box>
+          <Text
+            size="2"
+            style={{
+              color:
+                state.currentStep === "passport"
+                  ? "var(--teal-11)"
+                  : "var(--gray-11)",
+              fontWeight: state.currentStep === "passport" ? "600" : "400",
+            }}>
+            Identity Verification
           </Text>
-        </Box>
-
-        {/* Step Indicator */}
-        <Box style={{ textAlign: "center" }}>
-          <Flex gap="2" align="center" justify="center">
-            <Box
-              style={{
-                width: "24px",
-                height: "24px",
-                borderRadius: "50%",
-                backgroundColor:
-                  currentStep === "passport"
-                    ? "var(--teal-9)"
-                    : "var(--gray-6)",
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "12px",
-                fontWeight: "bold",
-              }}>
-              1
-            </Box>
-            <Text
-              size="2"
-              style={{
-                color:
-                  currentStep === "passport"
-                    ? "var(--teal-11)"
-                    : "var(--gray-11)",
-                fontWeight: currentStep === "passport" ? "600" : "400",
-              }}>
-              Identity Verification
-            </Text>
-            <Box
-              style={{
-                width: "20px",
-                height: "2px",
-                backgroundColor: "var(--gray-6)",
-              }}
-            />
-            <Box
-              style={{
-                width: "24px",
-                height: "24px",
-                borderRadius: "50%",
-                backgroundColor:
-                  currentStep === "seed" ? "var(--teal-9)" : "var(--gray-6)",
-                color: "white",
-                display: "flex",
-                alignItems: "center",
-                justifyContent: "center",
-                fontSize: "12px",
-                fontWeight: "bold",
-              }}>
-              2
-            </Box>
-            <Text
-              size="2"
-              style={{
-                color:
-                  currentStep === "seed" ? "var(--teal-11)" : "var(--gray-11)",
-                fontWeight: currentStep === "seed" ? "600" : "400",
-              }}>
-              Seedphrase Setup
-            </Text>
-          </Flex>
-        </Box>
-
-        {/* Step Content */}
-        {currentStep === "passport" && (
-          <PassportStep
-            onVerificationSuccess={handlePassportSuccess}
-            onBack={handleBack}
+          <Box
+            style={{
+              width: "20px",
+              height: "2px",
+              backgroundColor: "var(--gray-6)",
+            }}
           />
-        )}
-
-        {currentStep === "seed" && (
-          <SeedphraseStep
-            onContinue={handleSeedphraseContinue}
-            onBack={handleBack}
+          <Box
+            style={{
+              width: "24px",
+              height: "24px",
+              borderRadius: "50%",
+              backgroundColor:
+                state.currentStep === "seed"
+                  ? "var(--teal-9)"
+                  : "var(--gray-6)",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: "bold",
+            }}>
+            2
+          </Box>
+          <Text
+            size="2"
+            style={{
+              color:
+                state.currentStep === "seed"
+                  ? "var(--teal-11)"
+                  : "var(--gray-11)",
+              fontWeight: state.currentStep === "seed" ? "600" : "400",
+            }}>
+            Seedphrase Setup
+          </Text>
+          <Box
+            style={{
+              width: "20px",
+              height: "2px",
+              backgroundColor: "var(--gray-6)",
+            }}
           />
-        )}
-      </Flex>
-    </Container>
+          <Box
+            style={{
+              width: "24px",
+              height: "24px",
+              borderRadius: "50%",
+              backgroundColor:
+                state.currentStep === "recovery"
+                  ? "var(--teal-9)"
+                  : "var(--gray-6)",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: "bold",
+            }}>
+            3
+          </Box>
+          <Text
+            size="2"
+            style={{
+              color:
+                state.currentStep === "recovery"
+                  ? "var(--teal-11)"
+                  : "var(--gray-11)",
+              fontWeight: state.currentStep === "recovery" ? "600" : "400",
+            }}>
+            Recovery Setup
+          </Text>
+          <Box
+            style={{
+              width: "20px",
+              height: "2px",
+              backgroundColor: "var(--gray-6)",
+            }}
+          />
+          <Box
+            style={{
+              width: "24px",
+              height: "24px",
+              borderRadius: "50%",
+              backgroundColor:
+                state.currentStep === "sharing"
+                  ? "var(--teal-9)"
+                  : "var(--gray-6)",
+              color: "white",
+              display: "flex",
+              alignItems: "center",
+              justifyContent: "center",
+              fontSize: "12px",
+              fontWeight: "bold",
+            }}>
+            4
+          </Box>
+          <Text
+            size="2"
+            style={{
+              color:
+                state.currentStep === "sharing"
+                  ? "var(--teal-11)"
+                  : "var(--gray-11)",
+              fontWeight: state.currentStep === "sharing" ? "600" : "400",
+            }}>
+            Share Shards
+          </Text>
+        </Flex>
+      </Box>
+
+      {/* Step Content */}
+      {state.currentStep === "passport" && <PassportStep onBack={handleBack} />}
+
+      {state.currentStep === "seed" && <SeedphraseStep onBack={handleBack} />}
+
+      {state.currentStep === "recovery" && (
+        <RecoveryParamsStep onBack={handleBack} />
+      )}
+
+      {state.currentStep === "sharing" && (
+        <ShardSharingStep onBack={handleBack} />
+      )}
+    </>
   );
 }
