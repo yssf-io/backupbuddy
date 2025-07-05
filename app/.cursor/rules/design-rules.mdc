@@ -1,0 +1,91 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+# BackupBuddy – Branding Spec (Tailwind + Radix UI)
+
+## Core Identity
+
+* **Logo**: "B3 Shield" with “BackupBuddy” and tagline “Social Recovery 4 Everyone”
+* **Primary Color**: `#009CA8`
+* **Font**: `Inter`, sans-serif
+* **Accent Font (optional)**: `Space Grotesk`, sans-serif
+* **Border Radius**: `16px` for buttons, cards, modals
+
+## Color System (tailwind.config.js)
+
+```ts
+extend: {
+  colors: {
+    primary: '#009CA8',
+    primaryDark: '#007782',
+    textPrimary: '#0C1B33',
+    textSecondary: '#3F3F3F',
+    bgLight: '#F7FAFC',
+    error: '#EF4444',
+    success: '#22C55E',
+  },
+  fontFamily: {
+    sans: ['Inter', 'sans-serif'],
+    accent: ['Space Grotesk', 'sans-serif'],
+  },
+  borderRadius: {
+    xl: '16px',
+  }
+}
+```
+
+## Spacing Guidelines
+
+* `xs` – 4px
+* `sm` – 8px
+* `md` – 16px
+* `lg` – 24px
+* `xl` – 32px
+* `2xl` – 48px
+
+Use `p-*`, `m-*`, and `space-y-*` for vertical flow. Use `max-w-md` or `max-w-lg` for central column layout.
+
+## Typography
+
+* Headline (`h1`): `text-3xl font-bold text-textPrimary`
+* Subheading (`h2`): `text-xl font-semibold`
+* Body: `text-base text-textSecondary`
+* Caption: `text-sm text-gray-500`
+
+## Components
+
+**Buttons**
+
+```html
+<button class="bg-primary text-white font-semibold px-6 py-2 rounded-full hover:bg-primaryDark transition">
+  Confirm
+</button>
+```
+
+**Cards**
+
+```html
+<div class="bg-white rounded-2xl shadow-md p-6 space-y-4">
+  <!-- content -->
+</div>
+```
+
+## Radix UI Notes
+
+In this project, you should use Shadcn or Radix UI as much as possible for components. If you need a component, ask me to install it with the cli. Do not use Material UI or any other UI libraries.
+
+
+
+* Dialogs: use `z-50`, `rounded-2xl`, `backdrop-blur-sm`, `p-6`
+* Tabs: underline active tab with `border-b-2 border-primary`
+* Toast: match Tailwind base style (`bg-white`, `text-textPrimary`)
+* Tooltip: minimal with `bg-textPrimary text-white text-sm px-2 py-1 rounded`
+
+## UX Notes
+
+* Limit modals to a single purpose and CTA
+* Use vertical spacing for clarity on mobile
+* Prefer step-by-step layout over long forms
+* Keep click targets large (min `h-10 px-4`)

@@ -1,0 +1,58 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+**BackupBuddy Project Summary**
+
+**Overview**
+BackupBuddy is a secure, seedphrase-based wallet recovery system designed to be simple and intuitive for everyday users. It leverages zero-knowledge (ZK) proofs, trusted guardians, and decentralized storage mechanisms to allow users to recover crypto wallets without needing to store sensitive information themselves. The design prioritizes usability, making it accessible even to non-technical individuals.
+
+**Core Features**
+
+* **Seedphrase-based recovery**: Works with any wallet using BIP39, covering all crypto assets.
+* **Guardian system**: Users only need to remember their trusted guardians, not technical steps.
+* **No local storage required**: Seedphrases are encrypted, split, and stored securely.
+* **Zero-knowledge proof integration**: Ensures privacy-preserving verification.
+* **Step-by-step guided interface**: Simple flow for setup and recovery.
+
+**Technical Workflow**
+
+1. **Seedphrase Generation and Sharing**
+
+   * Users generate or import a BIP39 seedphrase.
+   * The seedphrase is split into SLIP39 shares.
+   * A hash (nullifier or custom identity hash) links the passphrase for later verification.
+   * The passphrase is only revealed after matching the correct nullifier via ZK proof.
+
+2. **Zero-Knowledge Proof Verification**
+
+   * The server first verifies the ZK proof.
+   * The same ZK proof is then verified on-chain via Celo smart contracts for decentralized validation.
+
+3. **On-Chain Logic and Incentivized Share Storage**
+
+   * Users can pay \$10 (held in AAVE) to store one encrypted share on the server.
+   * The user can reclaim their share at any time; interest stays with the platform.
+   * This system introduces a utility for the on-chain ZK proof and enables self-sustaining storage logic.
+
+4. **Cross-Chain Bridge to Oasis Protocol**
+
+   * The on-chain proof is bridged from Celo to Oasis using a custom server.
+   * Oasis TEE-based smart contracts use this proof to securely release the passphrase.
+   * This step compensates for Oasis not having native Chainlink integration.
+
+**Third-Party Integrations and Bounties**
+
+* **Chainlink**: Used for ZK proof verification on Celo.
+* **Oasis Protocol**: Secure TEE contracts store and release encrypted shares.
+* **Walrus**: Optional encrypted share storage with logic-based access and potential Google Wallet integration.
+* **World App**: Mini-app for storing a share within a widely adopted user environment.
+
+**Demo Concept**
+
+* Starts with a dramatization of risky paper-based seedphrase storage.
+* Demonstrates how BackupBuddy replaces it with guardian-based recovery.
+* Emphasizes the simplicity: “Just a backup. No explaining. Mum’s got it.”
+
+This system enables a secure, practical, and user-friendly solution for self-custody recovery—blending advanced cryptography with accessible UX.
