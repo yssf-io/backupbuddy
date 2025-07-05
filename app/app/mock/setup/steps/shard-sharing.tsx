@@ -189,7 +189,7 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
   const shareOnApp = (app: string, shard: Shard) => {
     const text = `BackupBuddy Shard for ${
       shard.guardianName
-    }:\n\n${shard.words.join(" ")}`;
+    }:\n\nhttps://4dba-78-203-116-217.ngrok-free.app/api/shares/${shard.id}`;
     const encodedText = encodeURIComponent(text);
 
     const urls = {
