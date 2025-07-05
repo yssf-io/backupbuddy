@@ -19,6 +19,7 @@ import {
   Box,
 } from "@radix-ui/themes";
 import { useToastContext } from "../../contexts/ToastContext";
+import StepIndicator from "../../components/StepIndicator";
 
 export default function RecoverPage() {
   const router = useRouter();
@@ -97,8 +98,18 @@ export default function RecoverPage() {
     router.push("/mock?step=start");
   };
 
+  const setupSteps: Step[] = [
+    { id: "passport", label: "Identity Verification" },
+    { id: "seed", label: "Seedphrase Setup" },
+    { id: "recovery", label: "Recovery Setup" },
+    { id: "sharing", label: "Share Shards" },
+  ];
+
   return (
     <>
+      {/* Step Indicator */}
+      <StepIndicator steps={setupSteps} currentStepId={"passport"} />
+
       {/* Main Card */}
       <Card size="3" style={{ maxWidth: "500px", width: "100%" }}>
         <Flex
