@@ -10,15 +10,15 @@ import {
   Box,
   Badge,
 } from "@radix-ui/themes";
-import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useSearchParams, useRouter } from "next/navigation";
 
 export default function MockPage() {
-  const [showChoice, setShowChoice] = useState(false);
+  const searchParams = useSearchParams();
   const router = useRouter();
+  const step = searchParams.get("step");
 
   const handleGetStarted = () => {
-    setShowChoice(true);
+    router.push("/mock?step=start");
   };
 
   const handleSetup = () => {
@@ -30,10 +30,10 @@ export default function MockPage() {
   };
 
   const handleBack = () => {
-    setShowChoice(false);
+    router.push("/mock");
   };
 
-  if (showChoice) {
+  if (step === "start") {
     return (
       <Container size="2" p="6">
         <Flex direction="column" gap="6" align="center">

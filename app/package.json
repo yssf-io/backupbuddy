@@ -9,6 +9,7 @@
     "start": "next start"
   },
   "dependencies": {
+    "@radix-ui/react-toast": "^1.2.14",
     "@radix-ui/themes": "^3.2.1",
     "@selfxyz/common": "^0.0.5",
     "@selfxyz/core": "^1.0.5-beta.1",
