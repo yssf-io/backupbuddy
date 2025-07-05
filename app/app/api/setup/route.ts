@@ -102,7 +102,24 @@ export async function POST(req: NextRequest) {
 
       const users = JSON.parse(usersRaw);
       console.log({ users });
-      users[userHash] = passphrase;
+
+      // if (
+      //   Object.values(users)
+      //     .map((x: any) => x.userHash)
+      //     .includes(userHash)
+      // ) {
+      //   return NextResponse.json(
+      //     {
+      //       status: "error",
+      //       result: false,
+      //       message: "User is already registered",
+      //       details: result.isValidDetails,
+      //     },
+      //     { status: 500 },
+      //   );
+      // }
+
+      users[result.userData.userIdentifier] = { userHash, passphrase };
       await redis.set("backup-users", JSON.stringify(users, null, 2));
 
       return NextResponse.json({

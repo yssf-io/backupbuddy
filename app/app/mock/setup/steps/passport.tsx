@@ -11,30 +11,52 @@ import { ethers } from "ethers";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
 import { useToastContext } from "../../../contexts/ToastContext";
 import { useSetup } from "../../../contexts/SetupContext";
+import { v4 } from "uuid";
+import { bytesToHex, hexToBytes } from "viem";
 
 interface PassportStepProps {
   onBack: () => void;
 }
 
+export function uuidToAddress(uuid: string): string {
+  // strip dashes & validate
+  const hex = uuid.replace(/-/g, '')
+  if (!/^[0-9a-fA-F]{32}$/.test(hex)) {
+    throw new Error(
+      `Invalid UUID v4: expected 32 hex chars, got ${hex.length}`
+    )
+  }
+  // parse into 16 bytes
+  const raw = hexToBytes(`0x${hex}`)             // Uint8Array(16)
+  // left-pad into 20 bytes
+  const padded = new Uint8Array(20)             // zeros by default
+  padded.set(raw, 20 - raw.length)              // copy into last 16 slots
+  // hex-encode
+  return bytesToHex(padded)                     // "0x00000000fcfd91c8be29465eb2f1093aa02bc4d5"
+}
+
 export default function PassportStep({ onBack }: PassportStepProps) {
   const { showToast } = useToastContext();
-  const { state, updatePassportState, goToNextStep } = useSetup();
+  const { state, updatePassportState, goToNextStep, setPassphrase } = useSetup();
   const [selfApp, setSelfApp] = useState<SelfApp | null>(null);
   const [userId] = useState(ethers.ZeroAddress);
+  const [id, setId] = useState("")
 
   // Use useEffect to ensure code only executes on the client side
   useEffect(() => {
     try {
       console.log({ scope: process.env.NEXT_PUBLIC_SELF_SCOPE });
+      const userId = v4()
+      setId(uuidToAddress(userId))
       const app = new SelfAppBuilder({
         version: 2,
         appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "BackupBuddy",
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "backupbuddy",
         endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
         logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
-        userId: userId,
+        userId,
         endpointType: "staging_https",
-        userIdType: "hex", // use 'hex' for ethereum address or 'uuid' for uuidv4
+        userIdType: "uuid",
         userDefinedData:
           "BackupBuddy will use this proof to let you recover your wallet",
         disclosures: {
@@ -81,7 +103,11 @@ export default function PassportStep({ onBack }: PassportStepProps) {
     displayToast("Opening Self App...");
   };
 
-  const handleSuccessfulVerification = () => {
+  const handleSuccessfulVerification = async () => {
+    const res = await fetch(`/api/pass/${encodeURIComponent(id)}`)
+    if (!res.ok) throw new Error('Key not found')
+    const { pass } = await res.json()
+    setPassphrase(pass)
     updatePassportState({ isVerified: true });
     displayToast("Verification successful! Moving to next step...");
     goToNextStep();

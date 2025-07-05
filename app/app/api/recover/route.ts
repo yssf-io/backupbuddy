@@ -7,6 +7,8 @@ import {
   DefaultConfigStore,
   VerificationConfig,
 } from "@selfxyz/core";
+import { AbiCoder, sha256 } from "ethers";
+import Redis from "ioredis";
 
 export async function POST(req: NextRequest) {
   console.log("Received request");
@@ -35,7 +37,7 @@ export async function POST(req: NextRequest) {
 
     const selfBackendVerifier = new SelfBackendVerifier(
       process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
-      process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP || "",
+      process.env.NEXT_PUBLIC_SELF_ENDPOINT_RECOVER || "",
       true,
       AllIds,
       configStore,
@@ -71,6 +73,35 @@ export async function POST(req: NextRequest) {
       const { name, issuingState, nationality, dateOfBirth, gender } =
         result.discloseOutput;
       console.log({ name, issuingState, nationality, dateOfBirth, gender });
+      const abiCoder = AbiCoder.defaultAbiCoder();
+      const encoded = abiCoder.encode(
+        ["string", "string", "string", "string", "string"],
+        [name, issuingState, nationality, dateOfBirth, gender],
+      );
+
+      const userHash = sha256(encoded);
+      const redis = new Redis(process.env.REDIS_ENDPOINT!);
+      const usersRaw = await redis.get("backup-users");
+      if (!usersRaw) {
+        return NextResponse.json(
+          {
+            status: "error",
+            result: false,
+            message: "Couldn't get backup-users key",
+            details: result.isValidDetails,
+          },
+          { status: 500 },
+        );
+      }
+
+      const users = JSON.parse(usersRaw);
+      const passphrase = Object.entries(users).find(
+        ([userId, userData]) =>
+          (userData as { userHash: string; passphrase: string }).userHash ===
+          userHash,
+      );
+
+      console.log({ passphrase });
 
       return NextResponse.json({
         status: "success",
