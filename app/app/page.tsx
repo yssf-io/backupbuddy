@@ -30,7 +30,7 @@ export default function Home() {
     const client = createPublicClient({
       chain: celoAlfajores,
       transport: http(
-        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy",
+        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy"
       ),
     });
 
@@ -70,7 +70,7 @@ export default function Home() {
         appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "Self Workshop",
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
         endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
-        logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
+        logoBase64: "https://i.postimg.cc/fbfr2nX1/logo.png",
         userId,
         endpointType: "staging_https",
         userIdType: "uuid",
