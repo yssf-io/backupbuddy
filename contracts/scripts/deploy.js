@@ -13,7 +13,11 @@ async function main() {
   console.log("Using VerificationConfigId at:", verificationConfigId);
   // Deploy the contract
   const ProofOfHuman = await hre.ethers.getContractFactory("ProofOfHuman");
-  const proofOfHuman = await ProofOfHuman.deploy(hubAddress, mockScope, verificationConfigId);
+  const proofOfHuman = await ProofOfHuman.deploy(
+    hubAddress,
+    mockScope,
+    verificationConfigId,
+  );
 
   await proofOfHuman.waitForDeployment();
   const contractAddress = await proofOfHuman.getAddress();
@@ -32,7 +36,7 @@ async function main() {
       await hre.run("verify:verify", {
         address: contractAddress,
         constructorArguments: [hubAddress, mockScope, verificationConfigId],
-        network: "alfajores"
+        network: "alfajores",
       });
       console.log("Contract verified successfully!");
     } catch (error) {
@@ -42,7 +46,9 @@ async function main() {
       }
     }
   } else if (!process.env.CELOSCAN_API_KEY) {
-    console.log("Skipping verification: CELOSCAN_API_KEY not found in environment");
+    console.log(
+      "Skipping verification: CELOSCAN_API_KEY not found in environment",
+    );
   }
 
   // Save deployment info
@@ -52,19 +58,21 @@ async function main() {
     contractAddress: contractAddress,
     hubAddress: hubAddress,
     deployedAt: new Date().toISOString(),
-    deployer: (await hre.ethers.provider.getSigner()).address
+    deployer: (await hre.ethers.provider.getSigner()).address,
   };
 
   fs.writeFileSync(
     "./deployments/latest.json",
-    JSON.stringify(deploymentInfo, null, 2)
+    JSON.stringify(deploymentInfo, null, 2),
   );
 
   console.log("\nDeployment complete!");
   console.log("Contract address:", contractAddress);
   console.log("\nNext steps:");
   console.log("1. Update NEXT_PUBLIC_SELF_ENDPOINT in app/.env");
-  console.log("2. Go to https://tools.self.xyz, generate the scope and update it in your contract");
+  console.log(
+    "2. Go to https://tools.self.xyz, generate the scope and update it in your contract",
+  );
 }
 
 main()
