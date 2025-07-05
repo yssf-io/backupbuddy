@@ -23,7 +23,7 @@ contract ProofOfHuman is SelfVerificationRoot {
     // Events for testing
     event VerificationCompleted(
         ISelfVerificationRoot.GenericDiscloseOutputV2 output,
-        bytes memory userData,
+        bytes userData,
         uint256 counter
     );
 
