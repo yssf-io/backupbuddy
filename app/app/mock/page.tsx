@@ -11,6 +11,7 @@ import {
   Badge,
 } from "@radix-ui/themes";
 import { useSearchParams, useRouter } from "next/navigation";
+import { Suspense } from "react";
 
 export default function MockPage() {
   const searchParams = useSearchParams();
@@ -35,7 +36,7 @@ export default function MockPage() {
 
   if (step === "start") {
     return (
-      <>
+      <Suspense>
         {/* Choice Card */}
         <Card size="3" style={{ maxWidth: "500px", width: "100%" }}>
           <Flex
@@ -176,12 +177,12 @@ export default function MockPage() {
             </Flex>
           </Flex>
         </Card>
-      </>
+      </Suspense>
     );
   }
 
   return (
-    <>
+    <Suspense>
       {/* Main Card */}
       <Card size="3" style={{ maxWidth: "500px", width: "100%" }}>
         <Flex
@@ -302,6 +303,6 @@ export default function MockPage() {
           </Flex>
         </Flex>
       </Card>
-    </>
+    </Suspense>
   );
 }

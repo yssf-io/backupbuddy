@@ -3,6 +3,7 @@ import "@radix-ui/themes/styles.css";
 import { ToastProvider } from "../contexts/ToastContext";
 import { Toaster } from "@/components/ui/toaster";
 import { Flex, Text, Heading, Container, Box } from "@radix-ui/themes";
+import { Suspense } from "react";
 
 export default function MockLayout({
   children,
@@ -10,6 +11,7 @@ export default function MockLayout({
   children: React.ReactNode;
 }) {
   return (
+    <Suspense>
     <Theme accentColor="teal" grayColor="slate" radius="large" scaling="100%">
       <ToastProvider>
         <Container size="3" p="6">
@@ -29,5 +31,6 @@ export default function MockLayout({
         <Toaster />
       </ToastProvider>
     </Theme>
+</Suspense>
   );
 }

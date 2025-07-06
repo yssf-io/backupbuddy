@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect } from "react";
+import { Suspense, useEffect } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import PassportStep from "./steps/passport";
 import SeedphraseStep from "./steps/seedphrase";
@@ -61,7 +61,7 @@ export default function SetupPage() {
   ];
 
   return (
-    <>
+    <Suspense>
       {/* Step Indicator */}
       <StepIndicator steps={setupSteps} currentStepId={state.currentStep} />
 
@@ -77,6 +77,6 @@ export default function SetupPage() {
       )}
 
       {state.currentStep === "seed" && <SeedphraseStep onBack={handleBack} />}
-    </>
+    </Suspense>
   );
 }

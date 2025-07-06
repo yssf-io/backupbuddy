@@ -1,6 +1,6 @@
 "use client";
 
-import React from "react";
+import React, { Suspense } from "react";
 import { SetupProvider } from "../../contexts/RecoverContext";
 
 export default function SetupLayout({
@@ -8,5 +8,5 @@ export default function SetupLayout({
 }: {
   children: React.ReactNode;
 }) {
-  return <SetupProvider>{children}</SetupProvider>;
+  return <Suspense><SetupProvider>{children}</SetupProvider></Suspense>;
 }
