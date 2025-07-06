@@ -12,7 +12,7 @@ import { v4 } from "uuid";
 import { ethers } from "ethers";
 import { createPublicClient, hexToString, http } from "viem";
 import { celoAlfajores } from "viem/chains";
-import ProofOfHuman from "./ProofOfHuman";
+import ProofOfHuman from "../src/lib/ProofOfHumanAbi";
 import { randomBytes } from "crypto";
 
 export default function Home() {
