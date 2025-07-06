@@ -11,8 +11,8 @@ import {
   Box,
   Container,
 } from "@radix-ui/themes";
-import { useToast } from "../../../../src/hooks/use-toast";
-import { useSetup } from "../../../contexts/SetupContext";
+import { useToast } from "../../../src/hooks/use-toast";
+import { useSetup } from "../../contexts/SetupContext";
 
 // SVG Icon components for visual clarity
 const CheckCircleIcon = () => (
@@ -132,11 +132,11 @@ export default function SetupSuccessPage() {
   const { state } = useSetup();
 
   const handleGoHome = () => {
-    router.push("/mock");
+    router.push("/");
   };
 
   const handleTestRecovery = () => {
-    router.push("/mock/recover");
+    router.push("/recover");
   };
 
   const handleCopyRecoveryInfo = () => {

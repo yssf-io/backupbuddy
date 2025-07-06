@@ -10,7 +10,7 @@ import {
   Box,
   Checkbox,
 } from "@radix-ui/themes";
-import { useSetup } from "../../../contexts/SetupContext";
+import { useSetup } from "../../contexts/SetupContext";
 
 interface RecoveryParamsStepProps {
   onBack: () => void;

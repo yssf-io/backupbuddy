@@ -8,12 +8,12 @@ import {
   DialogDescription,
   DialogHeader,
   DialogTitle,
-} from "../../../../src/components/ui/dialog";
-import { useToast } from "../../../../src/hooks/use-toast";
-import { useSetup } from "../../../contexts/SetupContext";
+} from "../../../src/components/ui/dialog";
+import { useToast } from "../../../src/hooks/use-toast";
+import { useSetup } from "../../contexts/SetupContext";
 import { useRouter } from "next/navigation";
-import { createShares } from "../../../../shamir";
-import { v4 } from "uuid";
+import { createShares } from "../../../shamir";
+
 // Simple icon components to avoid import issues
 const ChevronRightIcon = () => <span style={{ fontSize: "16px" }}>▶</span>;
 
@@ -29,54 +29,6 @@ interface Shard {
 interface ShardSharingStepProps {
   onBack: () => void;
 }
-
-// Mock shard data - in real implementation this would come from the previous step
-const generateMockShards = (
-  totalShards: number,
-  includeBackupBuddyShare: boolean
-): Shard[] => {
-  const mockWords = [
-    "abandon",
-    "ability",
-    "able",
-    "about",
-    "above",
-    "absent",
-    "absorb",
-    "abstract",
-    "absurd",
-    "abuse",
-    "access",
-    "accident",
-    "account",
-    "accuse",
-    "achieve",
-    "acid",
-    "acoustic",
-    "acquire",
-    "across",
-    "act",
-  ];
-
-  const shards: Shard[] = [];
-  for (let i = 0; i < totalShards - (includeBackupBuddyShare ? 1 : 0); i++) {
-    const words = Array.from(
-      { length: 12 },
-      () => mockWords[Math.floor(Math.random() * mockWords.length)]
-    );
-
-    shards.push({
-      id: `shard-${i + 1}`,
-      words,
-      guardianName: `Shard #${i + 1}`,
-      isShared: false,
-      isRevealed: false,
-      isActive: i === 0, // Only first shard is active initially
-    });
-  }
-
-  return shards;
-};
 
 export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
   const { toast } = useToast();
@@ -284,7 +236,7 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
       return;
     }
     setComplete(true);
-    router.push("/mock/setup/success");
+    router.push("/setup/success");
   };
 
   return (

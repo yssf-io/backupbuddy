@@ -10,8 +10,8 @@ import {
   Box,
   TextArea,
 } from "@radix-ui/themes";
-import { useToast } from "../../../../src/hooks/use-toast";
-import { useSetup } from "../../../contexts/RecoverContext";
+import { useToast } from "../../../src/hooks/use-toast";
+import { useSetup } from "../../contexts/RecoverContext";
 import { useRouter } from "next/navigation";
 
 interface ProvideShardsStepProps {
@@ -88,7 +88,7 @@ export default function ProvideShardsStep({ onBack }: ProvideShardsStepProps) {
       });
 
       // Move to next step
-      router.push("/mock/recover?step=seed");
+      router.push("/recover?step=seed");
     } catch (error) {
       console.error("Error validating shards:", error);
       toast({

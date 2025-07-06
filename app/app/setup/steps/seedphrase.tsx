@@ -2,8 +2,8 @@
 
 import React, { useEffect } from "react";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
-import { useToastContext } from "../../../contexts/ToastContext";
-import { useSetup } from "../../../contexts/SetupContext";
+import { useToastContext } from "../../contexts/ToastContext";
+import { useSetup } from "../../contexts/SetupContext";
 
 interface SeedphraseStepProps {
   onBack: () => void;

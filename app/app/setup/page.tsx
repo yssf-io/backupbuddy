@@ -6,8 +6,8 @@ import PassportStep from "./steps/passport";
 import SeedphraseStep from "./steps/seedphrase";
 import RecoveryParamsStep from "./steps/recovery-params";
 import ShardSharingStep from "./steps/shard-sharing";
-import { useSetup, SetupStep } from "../../contexts/SetupContext";
-import StepIndicator, { Step } from "../../components/StepIndicator";
+import { useSetup, SetupStep } from "../contexts/SetupContext";
+import StepIndicator, { Step } from "../components/StepIndicator";
 
 export default function SetupPage() {
   const router = useRouter();
@@ -49,7 +49,7 @@ export default function SetupPage() {
     } else if (state.currentStep === "seed") {
       setCurrentStep("passport");
     } else {
-      router.push("/mock?step=start");
+      router.push("/?step=start");
     }
   };
 

@@ -8,8 +8,8 @@ import {
   type SelfApp,
 } from "@selfxyz/qrcode";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
-import { useToastContext } from "../../../contexts/ToastContext";
-import { useSetup } from "../../../contexts/RecoverContext";
+import { useToastContext } from "../../contexts/ToastContext";
+import { useSetup } from "../../contexts/RecoverContext";
 import { v4 } from "uuid";
 import {
   bytesToHex,

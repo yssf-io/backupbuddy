@@ -2,15 +2,15 @@
 
 import { useEffect, useState } from "react";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
-import { useToastContext } from "../../../contexts/ToastContext";
-import { useSetup } from "../../../contexts/RecoverContext";
-import { combineShares } from "../../../../shamir";
+import { useToastContext } from "../../contexts/ToastContext";
+import { useSetup } from "../../contexts/RecoverContext";
+import { combineShares } from "../../../shamir";
 
 interface SeedphraseStepProps {
   onBack: () => void;
 }
 
-export default function SeedphraseStep({ onBack }: SeedphraseStepProps) {
+export default function SeedphraseStep({}: SeedphraseStepProps) {
   const { showToast } = useToastContext();
   const { state, updateSeedphraseState } = useSetup();
   const [isRevealed, setIsRevealed] = useState(false);
@@ -326,7 +326,7 @@ export default function SeedphraseStep({ onBack }: SeedphraseStepProps) {
             <Button
               size="2"
               variant="ghost"
-              onClick={() => (window.location.href = "/mock")}
+              onClick={() => (window.location.href = "/")}
               style={{
                 marginTop: "8px",
                 color: "#009CA8",

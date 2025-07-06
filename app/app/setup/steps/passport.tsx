@@ -8,12 +8,11 @@ import {
   type SelfApp,
 } from "@selfxyz/qrcode";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
-import { useToastContext } from "../../../contexts/ToastContext";
-import { useSetup } from "../../../contexts/SetupContext";
+import { useToastContext } from "../../contexts/ToastContext";
+import { useSetup } from "../../contexts/SetupContext";
 import {
   bytesToHex,
   createPublicClient,
-  Hex,
   hexToBytes,
   hexToString,
   http,
@@ -286,15 +285,14 @@ export default function PassportStep({ onBack }: PassportStepProps) {
             User Information
           </Heading>
           <Flex direction="column" gap="2">
-            <Flex gap="3" align="center">
+            {/* <Flex gap="3" align="center">
               <Text size="2" color="gray" style={{ minWidth: "80px" }}>
                 User ID:
               </Text>
               <Text size="2" style={{ fontFamily: "monospace" }}>
-                {/* {state.passport.userId || "Loading..."} */}
-                "TBD"
+                {state.passport.userId || "Loading..."} 
               </Text>
-            </Flex>
+            </Flex> */}
             <Flex gap="3" align="center">
               <Text size="2" color="gray" style={{ minWidth: "80px" }}>
                 Status:

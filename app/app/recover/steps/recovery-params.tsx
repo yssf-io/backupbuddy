@@ -1,7 +1,7 @@
 "use client";
 
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
-import { useSetup } from "../../../contexts/RecoverContext";
+import { useSetup } from "../../contexts/RecoverContext";
 
 interface RecoveryParamsStepProps {
   onBack: () => void;
