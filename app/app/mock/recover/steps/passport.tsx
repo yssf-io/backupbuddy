@@ -128,8 +128,8 @@ export default function PassportStep({ onBack }: PassportStepProps) {
       });
 
       const event = events.find(
-        (event) =>
-          hexToString(event.args?.userData ?? "0x").split("$")[0] === challenge
+        (_event) =>
+          hexToString(_event.args?.userData ?? "0x").split("$")[0] === challenge
       );
 
       nullifier = event?.args.output?.nullifier;
