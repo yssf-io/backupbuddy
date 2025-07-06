@@ -7,7 +7,6 @@ export type SetupStep = "passport" | "seed" | "recovery" | "sharing";
 
 export interface PassportState {
   isVerified: boolean;
-  userId: string;
   universalLink: string;
   linkCopied: boolean;
 }
@@ -73,7 +72,6 @@ const initialState: SetupState = {
   currentStep: "passport",
   passport: {
     isVerified: false,
-    userId: "",
     universalLink: "",
     linkCopied: false,
   },

@@ -65,6 +65,12 @@ const abi = [
         name: "userData",
         type: "bytes",
       },
+      {
+        indexed: false,
+        internalType: "uint256",
+        name: "counter",
+        type: "uint256",
+      },
     ],
     name: "VerificationCompleted",
     type: "event",
@@ -120,6 +126,13 @@ const abi = [
     name: "onVerificationSuccess",
     outputs: [],
     stateMutability: "nonpayable",
+    type: "function",
+  },
+  {
+    inputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    name: "registeredUsers",
+    outputs: [{ internalType: "uint256", name: "", type: "uint256" }],
+    stateMutability: "view",
     type: "function",
   },
   {
