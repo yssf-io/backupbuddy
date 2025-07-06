@@ -162,7 +162,7 @@ export default function RecoveryParamsStep({
                   How many shards to create (3-12 recommended)
                 </Text>
                 <Flex gap="2" wrap="wrap">
-                  {[3, 5, 7, 9, 11, 12].map((num) => (
+                  {[3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map((num) => (
                     <Button
                       key={num}
                       variant={
@@ -213,8 +213,8 @@ export default function RecoveryParamsStep({
                 </Text>
                 <Flex gap="2" wrap="wrap">
                   {Array.from(
-                    { length: state.recoveryParams.totalShards },
-                    (_, i) => i + 1
+                    { length: state.recoveryParams.totalShards - 2 },
+                    (_, i) => i + 2
                   ).map((num) => (
                     <Button
                       key={num}

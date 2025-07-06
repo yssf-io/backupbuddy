@@ -125,6 +125,21 @@ export function SetupProvider({ children }: { children: ReactNode }) {
   };
 
   const updateRecoveryParamsState = (updates: Partial<RecoveryParamsState>) => {
+    console.log("updates", updates);
+
+    if (
+      updates.totalShards &&
+      updates.totalShards <= state.recoveryParams.minShards
+    ) {
+      setState((prev) => ({
+        ...prev,
+        recoveryParams: {
+          ...prev.recoveryParams,
+          minShards: updates.totalShards - 1,
+        },
+      }));
+    }
+
     setState((prev) => ({
       ...prev,
       recoveryParams: { ...prev.recoveryParams, ...updates },
