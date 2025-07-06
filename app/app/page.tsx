@@ -30,7 +30,7 @@ export default function Home() {
     const client = createPublicClient({
       chain: celoAlfajores,
       transport: http(
-        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy",
+        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy"
       ),
     });
 

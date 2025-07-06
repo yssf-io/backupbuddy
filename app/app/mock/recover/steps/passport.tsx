@@ -54,7 +54,7 @@ export default function PassportStep({ onBack }: PassportStepProps) {
         appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "BackupBuddy",
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "backupbuddy",
         endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_RECOVER}`,
-        logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
+        logoBase64: "https://i.postimg.cc/fbfr2nX1/logo.png",
         userId,
         endpointType: "staging_https",
         userIdType: "uuid",
