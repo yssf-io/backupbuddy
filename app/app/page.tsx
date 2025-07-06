@@ -30,7 +30,7 @@ export default function Home() {
     const client = createPublicClient({
       chain: celoAlfajores,
       transport: http(
-        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy"
+        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy",
       ),
     });
 
@@ -48,41 +48,33 @@ export default function Home() {
     });
 
     console.log(events[0]);
-    console.log(events[0].args);
-    console.log(events[0].data);
+    console.log({ args: events[0].args });
+    console.log({ output: events[0].args.output });
     console.log({ userData: events[0].args.userData });
 
     const userDefinedData = hexToString(events[0].args.userData!);
 
     console.log("userDefinedData:", userDefinedData);
   };
-  // useEffect(() => {
-  //   readVerificationData();
-  // }, []);
+  useEffect(() => {
+    readVerificationData();
+  }, []);
 
   // Use useEffect to ensure code only executes on the client side
   useEffect(() => {
     try {
       console.log({ scope: process.env.NEXT_PUBLIC_SELF_SCOPE });
-      const userId = v4();
       const app = new SelfAppBuilder({
         version: 2,
         appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "Self Workshop",
         scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
-        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
-        logoBase64: "https://i.postimg.cc/fbfr2nX1/logo.png",
+        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS}`,
+        logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
         userId,
-        endpointType: "staging_https",
-        userIdType: "uuid",
+        endpointType: "staging_celo",
+        userIdType: "hex",
         userDefinedData:
           "backup buddy will use this proof to let you recover your wallet",
-        disclosures: {
-          name: true,
-          issuing_state: true,
-          nationality: true,
-          date_of_birth: true,
-          gender: true,
-        },
       }).build();
       console.log({ userId });
 
@@ -164,7 +156,8 @@ export default function Home() {
             type="button"
             onClick={copyToClipboard}
             disabled={!universalLink}
-            className="flex-1 bg-gray-800 hover:bg-gray-700 transition-colors text-white p-2 rounded-md text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed">
+            className="flex-1 bg-gray-800 hover:bg-gray-700 transition-colors text-white p-2 rounded-md text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
             {linkCopied ? "Copied!" : "Copy Universal Link"}
           </button>
 
@@ -172,7 +165,8 @@ export default function Home() {
             type="button"
             onClick={openSelfApp}
             disabled={!universalLink}
-            className="flex-1 bg-blue-600 hover:bg-blue-500 transition-colors text-white p-2 rounded-md text-sm sm:text-base mt-2 sm:mt-0 disabled:bg-blue-300 disabled:cursor-not-allowed">
+            className="flex-1 bg-blue-600 hover:bg-blue-500 transition-colors text-white p-2 rounded-md text-sm sm:text-base mt-2 sm:mt-0 disabled:bg-blue-300 disabled:cursor-not-allowed"
+          >
             Open Self App
           </button>
         </div>

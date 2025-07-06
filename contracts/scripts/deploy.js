@@ -16,7 +16,7 @@ async function main() {
   const proofOfHuman = await ProofOfHuman.deploy(
     hubAddress,
     mockScope,
-    verificationConfigId,
+    verificationConfigId
   );
 
   await proofOfHuman.waitForDeployment();
@@ -47,7 +47,7 @@ async function main() {
     }
   } else if (!process.env.CELOSCAN_API_KEY) {
     console.log(
-      "Skipping verification: CELOSCAN_API_KEY not found in environment",
+      "Skipping verification: CELOSCAN_API_KEY not found in environment"
     );
   }
 
@@ -63,7 +63,7 @@ async function main() {
 
   fs.writeFileSync(
     "./deployments/latest.json",
-    JSON.stringify(deploymentInfo, null, 2),
+    JSON.stringify(deploymentInfo, null, 2)
   );
 
   console.log("\nDeployment complete!");
@@ -71,7 +71,7 @@ async function main() {
   console.log("\nNext steps:");
   console.log("1. Update NEXT_PUBLIC_SELF_ENDPOINT in app/.env");
   console.log(
-    "2. Go to https://tools.self.xyz, generate the scope and update it in your contract",
+    "2. Go to https://tools.self.xyz, generate the scope and update it in your contract"
   );
 }
 
