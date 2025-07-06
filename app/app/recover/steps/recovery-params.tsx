@@ -77,7 +77,7 @@ export default function RecoveryParamsStep({
                   How many shards are needed to recover your wallet
                 </Text>
                 <Flex gap="2" wrap="wrap">
-                  {Array.from({ length: 12 }, (_, i) => i + 1).map((num) => (
+                  {Array.from({ length: 11 }, (_, i) => i + 2).map((num) => (
                     <Button
                       key={num}
                       variant={

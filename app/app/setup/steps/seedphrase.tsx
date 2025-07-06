@@ -1,9 +1,11 @@
 "use client";
 
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
 import { useToastContext } from "../../contexts/ToastContext";
 import { useSetup } from "../../contexts/SetupContext";
+import { ethers } from "ethers";
+import { Wand2, RefreshCw } from "lucide-react";
 
 interface SeedphraseStepProps {
   onBack: () => void;
@@ -12,6 +14,8 @@ interface SeedphraseStepProps {
 export default function SeedphraseStep({ onBack }: SeedphraseStepProps) {
   const { showToast } = useToastContext();
   const { state, updateSeedphraseState, goToNextStep } = useSetup();
+  const [isGenerating, setIsGenerating] = useState(false);
+  const [showGenerateDialog, setShowGenerateDialog] = useState(false);
 
   // Check if all 12 words are filled
   useEffect(() => {
@@ -20,6 +24,29 @@ export default function SeedphraseStep({ onBack }: SeedphraseStepProps) {
     );
     updateSeedphraseState({ isValid: allFilled });
   }, [state.seedphrase.words]);
+
+  const generateSeedphrase = async () => {
+    setIsGenerating(true);
+    try {
+      // Use ethers.js to generate a cryptographically secure mnemonic
+      const wallet = ethers.Wallet.createRandom();
+      const mnemonic = wallet.mnemonic?.phrase;
+
+      if (!mnemonic) {
+        throw new Error("Failed to generate mnemonic");
+      }
+
+      const words = mnemonic.split(" ");
+      updateSeedphraseState({ words });
+      showToast("New seedphrase generated securely!");
+      setShowGenerateDialog(false);
+    } catch (error) {
+      console.error("Error generating seedphrase:", error);
+      showToast("Failed to generate seedphrase. Please try again.");
+    } finally {
+      setIsGenerating(false);
+    }
+  };
 
   const handleWordChange = (index: number, value: string) => {
     const newSeedphrase = [...state.seedphrase.words];
@@ -75,6 +102,31 @@ export default function SeedphraseStep({ onBack }: SeedphraseStepProps) {
             </Text>
           </Box>
 
+          {/* Generate Button - Discrete but accessible */}
+          <Flex gap="2" align="center">
+            <Button
+              size="2"
+              variant="soft"
+              onClick={() => setShowGenerateDialog(true)}
+              disabled={isGenerating}
+              style={{
+                color: "#009CA8",
+                border: "1px solid #009CA8",
+                backgroundColor: "rgba(0, 156, 168, 0.1)",
+                fontWeight: 500,
+              }}>
+              <Wand2 size={16} />
+              Generate New Seedphrase
+            </Button>
+            {isGenerating && (
+              <RefreshCw
+                size={16}
+                className="animate-spin"
+                style={{ color: "#009CA8" }}
+              />
+            )}
+          </Flex>
+
           {/* Warning Card */}
           <Card
             size="2"
@@ -109,7 +161,8 @@ export default function SeedphraseStep({ onBack }: SeedphraseStepProps) {
               </Heading>
               <Text size="3" style={{ color: "var(--blue-11)" }}>
                 You can paste your entire 12-word seedphrase into any box and it
-                will automatically fill all fields.
+                will automatically fill all fields. Or generate a new secure
+                seedphrase above.
               </Text>
             </Flex>
           </Card>
@@ -308,6 +361,96 @@ export default function SeedphraseStep({ onBack }: SeedphraseStepProps) {
           </Flex>
         </Flex>
       </Card>
+
+      {/* Generate Dialog */}
+      {showGenerateDialog && (
+        <div
+          style={{
+            position: "fixed",
+            top: 0,
+            left: 0,
+            right: 0,
+            bottom: 0,
+            backgroundColor: "rgba(0, 0, 0, 0.5)",
+            display: "flex",
+            alignItems: "center",
+            justifyContent: "center",
+            zIndex: 1000,
+          }}
+          onClick={() => setShowGenerateDialog(false)}>
+          <Card
+            size="3"
+            style={{
+              maxWidth: "400px",
+              width: "90%",
+              backgroundColor: "white",
+            }}
+            onClick={(e) => e.stopPropagation()}>
+            <Flex direction="column" gap="4" align="center">
+              <Box style={{ textAlign: "center" }}>
+                <Heading size="4" style={{ fontWeight: 600 }}>
+                  Generate New Seedphrase
+                </Heading>
+                <Text color="gray" size="3" style={{ marginTop: "8px" }}>
+                  This will create a cryptographically secure 12-word seedphrase
+                  using your browser&apos;s secure random number generator.
+                </Text>
+              </Box>
+
+              <Card
+                size="2"
+                style={{
+                  width: "100%",
+                  border: "1px solid var(--orange-6)",
+                  backgroundColor: "var(--orange-1)",
+                }}>
+                <Flex direction="column" gap="2">
+                  <Heading size="3" style={{ color: "var(--orange-11)" }}>
+                    ⚠️ Important
+                  </Heading>
+                  <Text size="3" style={{ color: "var(--orange-11)" }}>
+                    This will replace your current seedphrase. Make sure to save
+                    the new seedphrase securely before proceeding.
+                  </Text>
+                </Flex>
+              </Card>
+
+              <Flex gap="3" style={{ width: "100%" }}>
+                <Button
+                  size="3"
+                  variant="ghost"
+                  onClick={() => setShowGenerateDialog(false)}
+                  style={{
+                    flex: 1,
+                    color: "var(--gray-11)",
+                    fontWeight: 500,
+                  }}>
+                  Cancel
+                </Button>
+                <Button
+                  size="3"
+                  color="teal"
+                  onClick={generateSeedphrase}
+                  disabled={isGenerating}
+                  style={{
+                    flex: 1,
+                    borderRadius: 16,
+                    fontWeight: 600,
+                  }}>
+                  {isGenerating ? (
+                    <Flex gap="2" align="center">
+                      <RefreshCw size={16} className="animate-spin" />
+                      Generating...
+                    </Flex>
+                  ) : (
+                    "Generate"
+                  )}
+                </Button>
+              </Flex>
+            </Flex>
+          </Card>
+        </div>
+      )}
 
       {/* Info Card */}
       <Card size="2" style={{ maxWidth: "600px", width: "100%" }}>
