@@ -105,38 +105,40 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
       );
       console.log({ shares });
 
-    try {
-      const response = await fetch('/api/uploadshares', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ shares }),
-      });
+      try {
+        const response = await fetch("/api/uploadshares", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({ shares }),
+        });
 
-      const data = await response.json();
+        const data = await response.json();
 
-      if (!response.ok) {
-        throw new Error(data.error || 'Something went wrong');
+        if (!response.ok) {
+          throw new Error(data.error || "Something went wrong");
+        }
+
+        console.log("Successfully stored shares. IDs:", data.shareIds);
+        const shards = shares
+          .map((s) => s.split(" "))
+          .map((s, i) => {
+            return {
+              id: data.shareIds[i],
+              words: s,
+              guardianName: `Guardian #${i}`,
+              isShared: false,
+              isActive: i === 0,
+              isRevealed: false,
+            };
+          });
+        updateShardSharingState({ shards: shards });
+      } catch (err: any) {
+        console.error("Failed to store shares:", err);
       }
-
-      console.log('Successfully stored shares. IDs:', data.shareIds);
-      const shards = shares.map((s) => s.split(" ")).map((s, i) => {return {
-        id: data.shareIds[i],
-        words: s,
-        guardianName: `Guardian #${i}`,
-        isShared: false,
-        isActive: i === 0,
-        isRevealed: false
-      }})
-      updateShardSharingState({ shards:  shards});
-
-    } catch (err: any) {
-      console.error('Failed to store shares:', err);
     }
-
-    }
-  }
+  };
   useEffect(() => {
     getShards();
   }, [
@@ -203,9 +205,7 @@ export default function ShardSharingStep({ onBack }: ShardSharingStepProps) {
   };
 
   const shareOnApp = (app: string, shard: Shard) => {
-    const text = `BackupBuddy Shard for ${
-      shard.guardianName
-    }:\n\nhttps://4dba-78-203-116-217.ngrok-free.app/api/shares/${shard.id}`;
+    const text = `BackupBuddy Shard for ${shard.guardianName}:\n\n${window.location.origin}/api/shares/${shard.id}`;
     const encodedText = encodeURIComponent(text);
 
     const urls = {
