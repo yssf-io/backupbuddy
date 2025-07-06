@@ -7,18 +7,28 @@ import {
   SelfAppBuilder,
   type SelfApp,
 } from "@selfxyz/qrcode";
-import { ethers } from "ethers";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
 import { useToastContext } from "../../../contexts/ToastContext";
 import { useSetup } from "../../../contexts/SetupContext";
+import {
+  bytesToHex,
+  createPublicClient,
+  Hex,
+  hexToBytes,
+  hexToString,
+  http,
+  zeroAddress,
+} from "viem";
+import { celoAlfajores } from "viem/chains";
+import proofOfHumanAbi from "@/lib/ProofOfHumanAbi";
 import { v4 } from "uuid";
-import { bytesToHex, hexToBytes } from "viem";
+import { timeout } from "@/lib/utils";
 
 interface PassportStepProps {
   onBack: () => void;
 }
 
-export function uuidToAddress(uuid: string): string {
+export function uuidToAddress(uuid: string): `0x${string}` {
   // strip dashes & validate
   const hex = uuid.replace(/-/g, "");
   if (!/^[0-9a-fA-F]{32}$/.test(hex)) {
@@ -40,42 +50,32 @@ export default function PassportStep({ onBack }: PassportStepProps) {
   const { state, updatePassportState, goToNextStep, setPassphrase } =
     useSetup();
   const [selfApp, setSelfApp] = useState<SelfApp | null>(null);
-  const [userId] = useState(ethers.ZeroAddress);
-  const [id, setId] = useState("");
+  const [challenge] = useState<string>(v4());
 
   // Use useEffect to ensure code only executes on the client side
   useEffect(() => {
     try {
       console.log({ scope: process.env.NEXT_PUBLIC_SELF_SCOPE });
-      const userId = v4();
-      setId(uuidToAddress(userId));
+
       const app = new SelfAppBuilder({
         version: 2,
-        appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "BackupBuddy",
-        scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "backupbuddy",
-        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_SETUP}`,
-        logoBase64: "https://i.postimg.cc/mrmVf9hm/self.png",
-        userId,
-        endpointType: "staging_https",
-        userIdType: "uuid",
-        userDefinedData:
-          "BackupBuddy will use this proof to let you recover your wallet",
-        disclosures: {
-          name: true,
-          issuing_state: true,
-          nationality: true,
-          date_of_birth: true,
-          gender: true,
-        },
+        appName: process.env.NEXT_PUBLIC_SELF_APP_NAME || "Self Workshop",
+        scope: process.env.NEXT_PUBLIC_SELF_SCOPE || "self-workshop",
+        endpoint: `${process.env.NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS}`,
+        logoBase64: "https://i.postimg.cc/fbfr2nX1/logo.png",
+        userId: zeroAddress,
+        endpointType: "staging_celo",
+        userIdType: "hex",
+        userDefinedData: `${challenge}$ Backup Buddy will use this proof to let you recover your wallet`,
       }).build();
 
       setSelfApp(app);
       const universalLink = getUniversalLink(app);
-      updatePassportState({ universalLink, userId });
+      updatePassportState({ universalLink });
     } catch (error) {
       console.error("Failed to initialize Self app:", error);
     }
-  }, [userId]);
+  }, []);
 
   const displayToast = (message: string) => {
     showToast(message);
@@ -104,12 +104,75 @@ export default function PassportStep({ onBack }: PassportStepProps) {
     displayToast("Opening Self App...");
   };
 
+  const readVerificationData = async (): Promise<bigint> => {
+    const client = createPublicClient({
+      chain: celoAlfajores,
+      transport: http(
+        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy"
+      ),
+    });
+
+    if (!process.env.NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS)
+      throw Error("not address found");
+
+    let nullifier: bigint | undefined = undefined;
+
+    while (nullifier === undefined) {
+      const events = await client.getFilterLogs({
+        filter: await client.createContractEventFilter({
+          abi: proofOfHumanAbi,
+          address: process.env
+            .NEXT_PUBLIC_SELF_ENDPOINT_ADDRESS as `0x${string}`,
+          eventName: "VerificationCompleted",
+          fromBlock: BigInt(0),
+          toBlock: await client.getBlockNumber(),
+        }),
+      });
+
+      console.log({ events });
+
+      const event = events.find((event) => {
+        console.log({
+          events,
+          userData: hexToString(event.args?.userData ?? "0x"),
+          challenge,
+        });
+        return (
+          hexToString(event.args?.userData ?? "0x").split("$")[0] === challenge
+        );
+      });
+
+      console.log({ event });
+
+      nullifier = event?.args.output?.nullifier;
+
+      await timeout(1000);
+    }
+
+    console.log("nullifier:", nullifier);
+
+    if (!nullifier) {
+      displayToast("Verification failed");
+      throw new Error("Verification failed");
+    }
+
+    return nullifier;
+  };
+
   const handleSuccessfulVerification = async () => {
-    const res = await fetch(`/api/pass/${encodeURIComponent(id)}`);
+    const nullifier = await readVerificationData();
+
+    const res = await fetch(`/api/setup`, {
+      method: "POST",
+      body: JSON.stringify({
+        nullifier: nullifier.toString(),
+      }),
+    });
+
     if (!res.ok) throw new Error("Key not found");
-    const { pass } = await res.json();
-    console.log({ pass });
-    setPassphrase("pass");
+    const { passphrase } = await res.json();
+    console.log({ passphrase });
+    setPassphrase(passphrase);
     updatePassportState({ isVerified: true });
     displayToast("Verification successful! Moving to next step...");
     goToNextStep();
@@ -228,7 +291,8 @@ export default function PassportStep({ onBack }: PassportStepProps) {
                 User ID:
               </Text>
               <Text size="2" style={{ fontFamily: "monospace" }}>
-                {state.passport.userId || "Loading..."}
+                {/* {state.passport.userId || "Loading..."} */}
+                "TBD"
               </Text>
             </Flex>
             <Flex gap="3" align="center">

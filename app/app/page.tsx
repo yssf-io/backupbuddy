@@ -12,7 +12,7 @@ import { v4 } from "uuid";
 import { ethers } from "ethers";
 import { createPublicClient, hexToString, http } from "viem";
 import { celoAlfajores } from "viem/chains";
-import ProofOfHuman from "./ProofOfHuman";
+import ProofOfHuman from "../src/lib/ProofOfHumanAbi";
 import { randomBytes } from "crypto";
 
 export default function Home() {
@@ -156,7 +156,8 @@ export default function Home() {
             type="button"
             onClick={copyToClipboard}
             disabled={!universalLink}
-            className="flex-1 bg-gray-800 hover:bg-gray-700 transition-colors text-white p-2 rounded-md text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed">
+            className="flex-1 bg-gray-800 hover:bg-gray-700 transition-colors text-white p-2 rounded-md text-sm sm:text-base disabled:bg-gray-400 disabled:cursor-not-allowed"
+          >
             {linkCopied ? "Copied!" : "Copy Universal Link"}
           </button>
 
@@ -164,7 +165,8 @@ export default function Home() {
             type="button"
             onClick={openSelfApp}
             disabled={!universalLink}
-            className="flex-1 bg-blue-600 hover:bg-blue-500 transition-colors text-white p-2 rounded-md text-sm sm:text-base mt-2 sm:mt-0 disabled:bg-blue-300 disabled:cursor-not-allowed">
+            className="flex-1 bg-blue-600 hover:bg-blue-500 transition-colors text-white p-2 rounded-md text-sm sm:text-base mt-2 sm:mt-0 disabled:bg-blue-300 disabled:cursor-not-allowed"
+          >
             Open Self App
           </button>
         </div>
