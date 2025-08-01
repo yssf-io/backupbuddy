@@ -2,7 +2,7 @@
 
 import React from "react";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
-import { useSetup } from "../../contexts/SetupContext";
+import { useSetup } from "../../contexts/SmartWalletContext"; // Uses SmartWalletContext
 
 interface ProviderStepProps {
   onBack: () => void;
@@ -14,6 +14,8 @@ export default function ProviderStep({ onBack }: ProviderStepProps) {
   return (
     <Flex direction="column" gap="6" align="center">
       <Card size="3" style={{ maxWidth: "500px", width: "100%" }}>
+        {/* The JSX for this component is identical to the one in /setup/steps */}
+        {/* ... (Paste the JSX from the previous provider.tsx here) ... */}
         <Flex
           direction="column"
           gap="5"
@@ -28,7 +30,6 @@ export default function ProviderStep({ onBack }: ProviderStepProps) {
               Select a method to verify your identity for recovery.
             </Text>
           </Box>
-
           <Flex
             direction="column"
             gap="4"
@@ -68,11 +69,7 @@ export default function ProviderStep({ onBack }: ProviderStepProps) {
               size="2"
               variant="ghost"
               onClick={onBack}
-              style={{
-                marginTop: "8px",
-                color: "#009CA8",
-                fontWeight: 500,
-              }}
+              style={{ marginTop: "8px", color: "#009CA8", fontWeight: 500 }}
             >
               ← Back
             </Button>

@@ -33,13 +33,15 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body
-        className={`${geistSans.variable} ${geistMono.variable} antialiased`}>
+        className={`${geistSans.variable} ${geistMono.variable} antialiased`}
+      >
         <Suspense>
           <Theme
             accentColor="teal"
             grayColor="slate"
             radius="large"
-            scaling="100%">
+            scaling="100%"
+          >
             <ToastProvider>
               <Container size="3" p="6">
                 <Flex direction="column" gap="6" align="center">
@@ -49,7 +51,7 @@ export default function RootLayout({
                       BackupBuddy
                     </Heading>
                     <Text size="5" color="gray">
-                      Social Recovery 4 Everyone
+                      Never lose your Digital Assets
                     </Text>
                   </Box>
                   {children}

@@ -75,8 +75,19 @@ export default function Page() {
                     fontSize: 18,
                   }}
                 >
-                  Setup Seed Phrase Backup
+                  Setup for a Seed Phrase
                 </Button>
+                <Text
+                  size="2"
+                  color="gray"
+                  style={{
+                    display: "block",
+                    textAlign: "center",
+                    marginTop: 4,
+                  }}
+                >
+                  Create a new backup for your seed phrase
+                </Text>
                 <Button
                   size="3"
                   color="teal"
@@ -89,7 +100,7 @@ export default function Page() {
                     marginTop: 18,
                   }}
                 >
-                  Setup Smart Wallet Recovery
+                  Setup for a Smart Wallet
                 </Button>
                 <Text
                   size="2"
@@ -100,7 +111,7 @@ export default function Page() {
                     marginTop: 4,
                   }}
                 >
-                  Create a new backup for your wallet
+                  Create a new backup for your smart wallet
                 </Text>
               </Box>
               <Box style={{ width: "100%", maxWidth: 380 }}>
@@ -116,7 +127,7 @@ export default function Page() {
                     fontSize: 18,
                   }}
                 >
-                  Recover Seedphrase
+                  Recover a Wallet
                 </Button>
                 <Text
                   size="2"
@@ -161,7 +172,7 @@ export default function Page() {
                     backgroundColor: "var(--teal-9)",
                   }}
                 />
-                <Text>Seedphrase-based recovery for any wallet</Text>
+                <Text>Identity-based recovery for any wallet</Text>
               </Flex>
               <Flex gap="3" align="center">
                 <Box
@@ -185,7 +196,9 @@ export default function Page() {
                     backgroundColor: "var(--teal-9)",
                   }}
                 />
-                <Text>Zero-knowledge proof integration for privacy</Text>
+                <Text>
+                  Zero-Knowledge proof of Passport or Facial Recognition
+                </Text>
               </Flex>
               <Flex gap="3" align="center">
                 <Box
@@ -291,7 +304,7 @@ export default function Page() {
                   backgroundColor: "var(--teal-9)",
                 }}
               />
-              <Text>Seedphrase-based recovery for any wallet</Text>
+              <Text>Identity-based recovery for any wallet</Text>
             </Flex>
             <Flex gap="3" align="center">
               <Box
@@ -315,7 +328,9 @@ export default function Page() {
                   backgroundColor: "var(--teal-9)",
                 }}
               />
-              <Text>Zero-knowledge proof integration for privacy</Text>
+              <Text>
+                Zero-Knowledge proof of Passport or Facial Recognition
+              </Text>
             </Flex>
             <Flex gap="3" align="center">
               <Box

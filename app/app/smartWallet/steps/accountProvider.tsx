@@ -2,14 +2,21 @@
 
 import React from "react";
 import { Flex, Text, Button, Card, Heading, Box } from "@radix-ui/themes";
-import { useSetup } from "../../contexts/SetupContext";
+import { useSetup } from "../../contexts/SmartWalletContext";
 
-interface ProviderStepProps {
+interface AccountProviderStepProps {
   onBack: () => void;
 }
 
-export default function ProviderStep({ onBack }: ProviderStepProps) {
-  const { goToNextStep } = useSetup();
+export default function AccountProviderStep({
+  onBack,
+}: AccountProviderStepProps) {
+  const { goToNextStep, setSmartAccountProvider } = useSetup();
+
+  const handleSelectSafe = () => {
+    setSmartAccountProvider("Safe");
+    goToNextStep();
+  };
 
   return (
     <Flex direction="column" gap="6" align="center">
@@ -22,10 +29,10 @@ export default function ProviderStep({ onBack }: ProviderStepProps) {
         >
           <Box style={{ textAlign: "center" }}>
             <Heading size="5" mb="2" style={{ fontWeight: 700 }}>
-              Choose Your Identity Provider
+              Choose Smart Account Provider
             </Heading>
             <Text color="gray" size="4">
-              Select a method to verify your identity for recovery.
+              Select the smart wallet you want to secure.
             </Text>
           </Box>
 
@@ -39,7 +46,7 @@ export default function ProviderStep({ onBack }: ProviderStepProps) {
               <Button
                 size="3"
                 color="teal"
-                onClick={goToNextStep}
+                onClick={handleSelectSafe}
                 style={{
                   width: "100%",
                   borderRadius: 16,
@@ -47,21 +54,7 @@ export default function ProviderStep({ onBack }: ProviderStepProps) {
                   fontSize: 18,
                 }}
               >
-                Use Passport (Self, ZK Proof)
-              </Button>
-            </Box>
-            <Box style={{ width: "100%", maxWidth: 380 }}>
-              <Button
-                size="3"
-                variant="soft"
-                style={{
-                  width: "100%",
-                  borderRadius: 16,
-                  fontWeight: 600,
-                  fontSize: 18,
-                }}
-              >
-                Use Facial Recognition
+                Use Safe
               </Button>
             </Box>
             <Button
