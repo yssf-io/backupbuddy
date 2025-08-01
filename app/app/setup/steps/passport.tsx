@@ -32,7 +32,7 @@ export function uuidToAddress(uuid: string): `0x${string}` {
   const hex = uuid.replace(/-/g, "");
   if (!/^[0-9a-fA-F]{32}$/.test(hex)) {
     throw new Error(
-      `Invalid UUID v4: expected 32 hex chars, got ${hex.length}`
+      `Invalid UUID v4: expected 32 hex chars, got ${hex.length}`,
     );
   }
   // parse into 16 bytes
@@ -107,7 +107,7 @@ export default function PassportStep({ onBack }: PassportStepProps) {
     const client = createPublicClient({
       chain: celoAlfajores,
       transport: http(
-        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy"
+        "https://celo-alfajores.g.alchemy.com/v2/xuXS9MBUWVvB6Xsh9XIN00spOReFm0Jy",
       ),
     });
 
@@ -185,13 +185,15 @@ export default function PassportStep({ onBack }: PassportStepProps) {
           direction="column"
           gap="5"
           align="center"
-          style={{ width: "100%" }}>
+          style={{ width: "100%" }}
+        >
           <Box style={{ textAlign: "center" }}>
             <Heading
               size="5"
               mb="2"
               style={{ fontWeight: 700 }}
-              onClick={handleSuccessfulVerification}>
+              onClick={handleSuccessfulVerification}
+            >
               Identity Verification
             </Heading>
             <Text color="gray" size="4">
@@ -220,7 +222,8 @@ export default function PassportStep({ onBack }: PassportStepProps) {
                   justifyContent: "center",
                   borderRadius: "12px",
                   margin: "0 auto",
-                }}>
+                }}
+              >
                 <Text color="gray">Loading QR Code...</Text>
               </Box>
             )}
@@ -231,7 +234,8 @@ export default function PassportStep({ onBack }: PassportStepProps) {
             direction="column"
             gap="4"
             align="center"
-            style={{ width: "100%" }}>
+            style={{ width: "100%" }}
+          >
             <Box style={{ width: "100%", maxWidth: 380 }}>
               <Button
                 size="3"
@@ -243,7 +247,8 @@ export default function PassportStep({ onBack }: PassportStepProps) {
                   borderRadius: 16,
                   fontWeight: 600,
                   fontSize: 18,
-                }}>
+                }}
+              >
                 {state.passport.linkCopied ? "Copied!" : "Copy Universal Link"}
               </Button>
             </Box>
@@ -259,7 +264,8 @@ export default function PassportStep({ onBack }: PassportStepProps) {
                   borderRadius: 16,
                   fontWeight: 600,
                   fontSize: 18,
-                }}>
+                }}
+              >
                 Open Self App
               </Button>
             </Box>
@@ -271,7 +277,8 @@ export default function PassportStep({ onBack }: PassportStepProps) {
                 marginTop: "8px",
                 color: "#009CA8",
                 fontWeight: 500,
-              }}>
+              }}
+            >
               ← Back
             </Button>
           </Flex>
@@ -304,7 +311,8 @@ export default function PassportStep({ onBack }: PassportStepProps) {
                     ? "var(--green-11)"
                     : "var(--orange-11)",
                   fontWeight: 600,
-                }}>
+                }}
+              >
                 {state.passport.isVerified ? "✓ Verified" : "⏳ Pending"}
               </Text>
             </Flex>
