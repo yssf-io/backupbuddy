@@ -8,6 +8,7 @@ import RecoveryParamsStep from "./steps/recovery-params";
 import ShardSharingStep from "./steps/shard-sharing";
 import { useSetup, SetupStep } from "../contexts/SetupContext";
 import StepIndicator, { Step } from "../components/StepIndicator";
+import ProviderStep from "./steps/provider";
 
 export default function SetupPage() {
   const router = useRouter();
@@ -21,8 +22,8 @@ export default function SetupPage() {
   useEffect(() => {
     if (urlStep && urlStep !== state.currentStep) {
       setCurrentStep(urlStep);
-    } else if (!urlStep && state.currentStep !== "passport") {
-      setCurrentStep("passport");
+    } else if (!urlStep && state.currentStep !== "provider") {
+      setCurrentStep("provider");
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [urlStep]);
@@ -48,12 +49,15 @@ export default function SetupPage() {
       setCurrentStep("seed");
     } else if (state.currentStep === "seed") {
       setCurrentStep("passport");
+    } else if (state.currentStep === "passport") {
+      setCurrentStep("provider");
     } else {
       router.push("/?step=start");
     }
   };
 
   const setupSteps: Step[] = [
+    { id: "provider", label: "Identity Provider" },
     { id: "passport", label: "Identity Verification" },
     { id: "seed", label: "Seedphrase Setup" },
     { id: "recovery", label: "Recovery Setup" },
@@ -66,6 +70,8 @@ export default function SetupPage() {
       <StepIndicator steps={setupSteps} currentStepId={state.currentStep} />
 
       {/* Step Content */}
+      {state.currentStep === "provider" && <ProviderStep onBack={handleBack} />}
+
       {state.currentStep === "passport" && <PassportStep onBack={handleBack} />}
 
       {state.currentStep === "seed" && <SeedphraseStep onBack={handleBack} />}

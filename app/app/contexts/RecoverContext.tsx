@@ -3,7 +3,12 @@
 import React, { createContext, useContext, useState, ReactNode } from "react";
 
 // Types for all setup states
-export type SetupStep = "passport" | "seed" | "shards" | "recovery";
+export type SetupStep =
+  | "passport"
+  | "seed"
+  | "shards"
+  | "recovery"
+  | "provider";
 
 export interface PassportState {
   isVerified: boolean;
@@ -66,7 +71,7 @@ interface RecoverContextType {
 
 // Initial state
 const initialState: SetupState = {
-  currentStep: "passport",
+  currentStep: "provider",
   passport: {
     isVerified: false,
     userId: "",
@@ -140,7 +145,13 @@ export function SetupProvider({ children }: { children: ReactNode }) {
     setState(initialState);
   };
 
-  const stepOrder: SetupStep[] = ["passport", "recovery", "shards", "seed"];
+  const stepOrder: SetupStep[] = [
+    "provider",
+    "passport",
+    "recovery",
+    "shards",
+    "seed",
+  ];
 
   const goToNextStep = () => {
     setState((prev) => {
