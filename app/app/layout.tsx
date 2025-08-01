@@ -21,8 +21,8 @@ const geistMono = localFont({
 });
 
 export const metadata: Metadata = {
-  title: "Self Workshop",
-  description: "Self Workshop",
+  title: "BackupBuddy",
+  description: "Never lose your Digital Assets with BackupBuddy",
 };
 
 export default function RootLayout({
