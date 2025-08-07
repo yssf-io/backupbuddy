@@ -10,6 +10,7 @@ import {
   Badge,
 } from "@radix-ui/themes";
 import { useSearchParams, useRouter } from "next/navigation";
+import Script from "next/script";
 import { Suspense } from "react";
 
 export default function Page() {
