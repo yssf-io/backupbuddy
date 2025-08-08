@@ -5,6 +5,7 @@ import React, { createContext, useContext, useState, ReactNode } from "react";
 // Types for all setup states
 export type SetupStep =
   | "passport"
+  | "faceio"
   | "seed"
   | "shards"
   | "recovery"
@@ -47,10 +48,12 @@ export interface ProvideShardsState {
 // Main setup state interface
 export interface SetupState {
   currentStep: SetupStep;
+  history: SetupStep[];
   passport: PassportState;
   seedphrase: SeedphraseState;
   recoveryParams: RecoveryParamsState;
   shardSharing: ProvideShardsState;
+  identityProvider: "passport" | "faceio" | null;
   passphrase: string;
 }
 
@@ -66,12 +69,14 @@ interface RecoverContextType {
   resetSetup: () => void;
   goToNextStep: () => void;
   goToPreviousStep: () => void;
+  setIdentityProvider: (newIdentityProvider: string) => void;
   setPassphrase: (newPass: string) => void;
 }
 
 // Initial state
 const initialState: SetupState = {
   currentStep: "provider",
+  history: [],
   passport: {
     isVerified: false,
     userId: "",
@@ -91,6 +96,7 @@ const initialState: SetupState = {
     isDialogOpen: false,
     revealedItems: { shard: false },
   },
+  identityProvider: null,
   passphrase: "",
 };
 
@@ -103,6 +109,10 @@ export function SetupProvider({ children }: { children: ReactNode }) {
 
   const setCurrentStep = (step: SetupStep) => {
     setState((prev) => ({ ...prev, currentStep: step }));
+  };
+
+  const setIdentityProvider = (newIdentityProvider: "passport" | "faceio") => {
+    setState((prev) => ({ ...prev, identityProvider: newIdentityProvider }));
   };
 
   const setPassphrase = (newPass: string) => {
@@ -153,7 +163,25 @@ export function SetupProvider({ children }: { children: ReactNode }) {
     "seed",
   ];
 
-  const goToNextStep = () => {
+  type StepFlow = Record<
+    SetupStep,
+    SetupStep | ((state: SetupState) => SetupStep)
+  >;
+
+  const stepFlow: StepFlow = {
+    provider: (state: SetupState) => {
+      if (state.identityProvider === "passport") return "passport";
+      if (state.identityProvider === "faceio") return "faceio";
+      return state.currentStep;
+    },
+    passport: "recovery",
+    faceio: "recovery",
+    recovery: "shards",
+    shards: "seed",
+    seed: "seed",
+  };
+
+  const goToNextStepOld = () => {
     setState((prev) => {
       const currentIndex = stepOrder.indexOf(prev.currentStep);
       const nextStep = stepOrder[currentIndex + 1];
@@ -165,7 +193,28 @@ export function SetupProvider({ children }: { children: ReactNode }) {
     });
   };
 
-  const goToPreviousStep = () => {
+  const goToNextStep = () => {
+    setState((prev) => {
+      // Find the next step using the flow map
+      const nextStepOrFn = stepFlow[prev.currentStep];
+
+      const nextStep =
+        typeof nextStepOrFn === "function"
+          ? nextStepOrFn(prev) // Execute function for conditional steps
+          : nextStepOrFn; // Use string for linear steps
+
+      if (nextStep && nextStep !== prev.currentStep) {
+        // Add the current step to history before moving to the next
+        const newHistory = [...prev.history, prev.currentStep];
+        return { ...prev, currentStep: nextStep, history: newHistory };
+      }
+
+      // If no next step, or choice isn't made yet, stay on the current step
+      return prev;
+    });
+  };
+
+  const goToPreviousStepOld = () => {
     setState((prev) => {
       const currentIndex = stepOrder.indexOf(prev.currentStep);
       const previousStep = stepOrder[currentIndex - 1];
@@ -177,9 +226,26 @@ export function SetupProvider({ children }: { children: ReactNode }) {
     });
   };
 
+  const goToPreviousStep = () => {
+    setState((prev) => {
+      // Get the last step from our history
+      const lastStep = prev.history[prev.history.length - 1];
+
+      if (lastStep) {
+        // Remove the last entry from history
+        const newHistory = prev.history.slice(0, -1);
+        return { ...prev, currentStep: lastStep, history: newHistory };
+      }
+
+      // If history is empty, do nothing (or navigate to a default page)
+      return prev;
+    });
+  };
+
   const value: RecoverContextType = {
     state,
     setCurrentStep,
+    setIdentityProvider,
     setPassphrase,
     updatePassportState,
     updateSeedphraseState,

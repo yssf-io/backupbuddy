@@ -9,6 +9,7 @@ import ShardSharingStep from "./steps/provide-shards";
 import { useSetup, SetupStep } from "../contexts/RecoverContext";
 import StepIndicator, { Step } from "../components/StepIndicator";
 import ProviderStep from "./steps/provider";
+import FaceioStep from "./steps/faceio";
 
 export default function SetupPage() {
   const router = useRouter();
@@ -51,6 +52,8 @@ export default function SetupPage() {
       setCurrentStep("passport");
     } else if (state.currentStep === "passport") {
       setCurrentStep("provider");
+    } else if (state.currentStep === "faceio") {
+      setCurrentStep("provider");
     } else {
       router.push("/?step=start");
     }
@@ -59,6 +62,7 @@ export default function SetupPage() {
   const setupSteps: Step[] = [
     { id: "provider", label: "Identity Provider" },
     { id: "passport", label: "Identity Verification" },
+    { id: "faceio", label: "Identity Verification" },
     { id: "recovery", label: "Recovery Setup" },
     { id: "shards", label: "Provide Shards" },
     { id: "seed", label: "Recover Seedphrase" },
@@ -73,6 +77,8 @@ export default function SetupPage() {
       {state.currentStep === "provider" && <ProviderStep onBack={handleBack} />}
 
       {state.currentStep === "passport" && <PassportStep onBack={handleBack} />}
+
+      {state.currentStep === "faceio" && <FaceioStep onBack={handleBack} />}
 
       {state.currentStep === "recovery" && (
         <RecoveryParamsStep onBack={handleBack} />

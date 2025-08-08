@@ -18,11 +18,12 @@ interface ProviderStepProps {
 }
 
 export default function ProviderStep({ onBack }: ProviderStepProps) {
-  const { goToNextStep } = useSetup();
+  const { goToNextStep, setIdentityProvider } = useSetup();
   const [facialRec, setFacialRec] = useState(false);
 
-  const goToFacialRecognition = () => {
-    setFacialRec(true);
+  const handleNextStep = (choice: "passport" | "faceio") => {
+    setIdentityProvider(choice);
+    goToNextStep();
   };
 
   return (
@@ -54,7 +55,7 @@ export default function ProviderStep({ onBack }: ProviderStepProps) {
                 <Button
                   size="3"
                   color="teal"
-                  onClick={goToNextStep}
+                  onClick={() => handleNextStep("passport")}
                   style={{
                     width: "100%",
                     borderRadius: 16,
@@ -69,7 +70,8 @@ export default function ProviderStep({ onBack }: ProviderStepProps) {
                 <Button
                   size="3"
                   variant="soft"
-                  onClick={goToFacialRecognition}
+                  onClick={() => handleNextStep("faceio")}
+                  // onClick={() => setFacialRec(true)}
                   style={{
                     width: "100%",
                     borderRadius: 16,
