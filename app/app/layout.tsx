@@ -8,6 +8,9 @@ import { Suspense } from "react";
 import type { Metadata } from "next";
 import localFont from "next/font/local";
 import "./globals.css";
+import Script from "next/script";
+import FaceAuth from "./components/FaceAuth";
+import { FaceIOProvider } from "./contexts/FaceIOContext";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -54,6 +57,7 @@ export default function RootLayout({
                       Never lose your Digital Assets
                     </Text>
                   </Box>
+                  <div id="faceio-modal"></div>
                   {children}
                 </Flex>
               </Container>
