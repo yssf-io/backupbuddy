@@ -1,7 +1,5 @@
-import type { NextConfig } from "next";
-
 /** @type {import('next').NextConfig} */
-const nextConfig: NextConfig = {
+const nextConfig = {
   eslint: {
     // skip lint step in prod build
     ignoreDuringBuilds: true,
